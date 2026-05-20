@@ -142,6 +142,36 @@ before writing any bytecode:
    synced, wallet funded ~180 RXD) for the negative-case-rejection
    proofs the mandates require.
 
+## Toolchain reconciliation (2026-05-20)
+
+The shipped artifacts were built with `rxdc 0.1.0`; the local
+RadiantScript compiler is `rxdc 1.1.0-v2` (`~/apps/RadiantScript`,
+a lerna monorepo; `packages/cashc` is the `rxdc` compiler). Checked
+whether the version gap breaks compatibility — **it does not:**
+
+- **Artifact format `version: 9` is identical** across the bump
+  (shipped sentinel: `version=9` int; compiler `generateArtifact`
+  emits `version: 9`). pyrxd's loader keys (`contract`, `hex`, `abi`)
+  are all produced; `hex` is an optional artifact field generated via
+  `@radiantscript/utils` `scriptToBytecode`.
+- **`^0.9.0` is a language pragma**, distinct from the compiler
+  package version. The opcode set it targets is the same
+  `0xc4`/`0xcc`/`0xdc`/`0xde` family pyrxd already encodes in
+  `constants.py`.
+- **`TokenSwap.rxd` / `FungibleToken.rxd` examples exist** in the
+  compiler repo and use `tx.outputs.refValueSum($ref)` — the exact
+  idiom for fix #3. ⚠️ But `TokenSwap.rxd` *itself* has the panel's
+  bug: it checks only aggregate `refValueSum` equality and
+  `>= amount`, never clamps output count or pins the recipient's
+  exact share. **Do not copy it naively** — it is the textbook
+  instance of the under-constraint the panel caught.
+
+**Remaining empirical risk (deferred to the build session):** whether
+`rxdc 1.1.0-v2` codegen is byte-identical to `0.1.0`. Close it the
+dMint way — compile `FungibleToken.rxd`, diff its `hex` against
+pyrxd's `build_ft_locking_script` output (the known-correct mainnet FT
+shape). No bytecode for the swap covenant until that diff matches.
+
 ---
 
 **Single review question this doc must survive:** *what does shipping
