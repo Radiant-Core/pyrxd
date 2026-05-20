@@ -166,11 +166,40 @@ whether the version gap breaks compatibility — **it does not:**
   exact share. **Do not copy it naively** — it is the textbook
   instance of the under-constraint the panel caught.
 
-**Remaining empirical risk (deferred to the build session):** whether
-`rxdc 1.1.0-v2` codegen is byte-identical to `0.1.0`. Close it the
-dMint way — compile `FungibleToken.rxd`, diff its `hex` against
-pyrxd's `build_ft_locking_script` output (the known-correct mainnet FT
-shape). No bytecode for the swap covenant until that diff matches.
+**Build-session results (2026-05-20):**
+
+- **Compiler built and runs.** `~/apps/RadiantScript/packages/cashc`
+  builds with `npm run build` (Node 22); the `rxdc` CLI is
+  `dist/main/cashc-cli.js`. Despite the package version `1.1.0-v2`, it
+  **stamps `compilerVersion: rxdc 0.1.0`** and emits all 6 artifact
+  keys incl. `hex` — i.e. it IS the compiler that built the shipped
+  artifacts. No codegen-version gap.
+- **Grammar gotcha:** the `examples/radiant/*.rxd` files (with
+  `function transfer(...)`, `pragma ^0.9.0`) **do not parse** — wrong
+  grammar generation. The accepted grammar is `pragma radiantscript
+  ^0.1.0` with bare `function (...)` (see
+  `packages/cashc/test/valid-contract-files/rxd_fungible_token.rxd`).
+  Write the swap covenant in THAT syntax.
+- **Codegen-drift question dissolved.** It was the wrong question. The
+  mainnet FT *output* locking script's conservation epilogue
+  (`dec0e9aa76e378e4a269e69d`) is **hard-coded as a literal byte
+  constant** in pyrxd's `build_ft_locking_script`
+  ([script.py:138](../../src/pyrxd/glyph/script.py#L138)) — it is NOT
+  re-derived from a compiler. The freshly-compiled `FungibleToken.rxd`
+  produces a *different* epilogue (`c0e9aa...`, reordered opcodes) —
+  proving you must NOT regenerate the FT script from source; you must
+  reproduce the exact mainnet bytes.
+
+**Consequence for the swap covenant (simplifies it):** the covenant
+does **not** re-implement FT conservation. It CATs the *literal*
+mainnet FT epilogue into the constructed settlement output, then
+asserts the full output bytecode via `OP_OUTPUTBYTECODE
+OP_EQUALVERIFY`. FT conservation rides inside that constructed FT
+script (enforced by the network when the output is later spent). The
+swap covenant's narrower job: bind ref + exact photon value (=FT
+amount) + output count, and assert the exact FT output script. This
+sidesteps codegen drift entirely — the epilogue is a literal, not a
+compiled artifact.
 
 ---
 
