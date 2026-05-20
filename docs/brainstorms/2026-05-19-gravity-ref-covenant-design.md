@@ -285,12 +285,58 @@ genuine redesign + a likely fresh divergent-review pass.
 100k units — dry-run rejection means nothing was burned). Covenant
 compiles with correct hardening opcodes. The blocker is now an
 architecture question, not a coding one: *how does an FT-CSH-conserved
-token get held by a swap covenant?* That is the next session's design
-problem — resolve it (read Radiant Core's conservation algorithm and
-how Photonic's swap.ts actually moves FTs, since swap.ts is UI-level
-pre-signed txs, NOT a holding covenant — which may itself be the
-answer: maybe FTs are never *held* in a covenant, only moved by
-pre-signed atomic txs).
+token get held by a swap covenant?*
+
+### Photonic investigation (2026-05-20) — and an UNRESOLVED contradiction
+
+Read Photonic's swap + vault code for the canonical pattern:
+
+- **`swap.ts`** (`packages/app/src/swap.ts`) does NOT use a holding
+  covenant. It moves the FT to an FT-script at a dedicated **swap
+  sub-address** (`ftScript(swapAddress, ref)` — still a normal
+  conserving FT UTXO) and uses **SIGHASH-flagged partial signatures**
+  (`tx.ts:21,47`) for atomicity. So one real model is: *FTs are never
+  held in a non-FT covenant — they stay FT-shaped and swaps are
+  pre-signed atomic txs.*
+
+- **`vault.ts`** (`packages/lib/src/vault.ts`) DOES claim to vault FTs
+  with an added CLTV constraint, via `vaultFtRedeemScript` (vault.ts:268):
+  ```
+  <locktime> OP_CHECKLOCKTIMEVERIFY OP_DROP
+  OP_STATESEPARATOR OP_PUSHINPUTREF <ref>
+  OP_REFOUTPUTCOUNT_OUTPUTS OP_INPUTINDEX OP_CODESCRIPTBYTECODE_UTXO
+  OP_HASH256 OP_DUP OP_CODESCRIPTHASHVALUESUM_UTXOS OP_OVER
+  OP_CODESCRIPTHASHVALUESUM_OUTPUTS OP_GREATERTHANOREQUAL OP_VERIFY
+  OP_CODESCRIPTHASHOUTPUTCOUNT_OUTPUTS OP_NUMEQUALVERIFY
+  ```
+  i.e. the covenant constraint is *prepended* and the **full FT
+  conservation epilogue is embedded inside the redeem script**.
+
+**The unresolved contradiction (do NOT build until settled):**
+`vault.ts` funds the vault to a **P2SH output**
+(`p2shOutputScript` = `OP_HASH160 <hash> OP_EQUAL`, vault.ts:303) —
+which exposes **no ref**, exactly the shape the mainnet node REJECTED
+in my funding dry-run. And Photonic has **no FT-vault tests**
+(searched `packages/lib/test/` — none), so this path may be
+**aspirational/untested** (per memory: Photonic is the default
+reference but not infallible). Two live possibilities, unresolved:
+
+1. Photonic's FT vault has the same conservation bug my spike hit
+   (P2SH funding burns the ref) — i.e. it doesn't actually work
+   on-chain for FTs. My mainnet rejection is hard evidence this is
+   plausible.
+2. Radiant's conservation rule looks *past* the P2SH hash somehow
+   (counts refs in the revealed redeem script on the spend side, with
+   some funding-side accommodation I haven't found).
+
+**I will not guess between these.** The authoritative answer is in
+**Radiant Core's actual conservation algorithm** (the consensus code
+that emits `bad-txns-inputs-outputs-invalid-transaction-reference-operations`),
+which I have not read. Next session: read that consensus code (or test
+Photonic's FT vault directly on regtest/mainnet with a tiny amount) to
+determine whether ANY P2SH-wrapped FT covenant can conserve, OR whether
+the swap.ts "pre-signed atomic, FT stays FT-shaped" model is the only
+viable one. The covenant design depends entirely on which is true.
 
 ---
 
