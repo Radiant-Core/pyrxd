@@ -235,11 +235,62 @@ contract UTXO are all **bare scripts** too.
 - This is exactly the deploy-model divergence the dMint incidents warn
   about; caught at the funding step *before* burning the real FT.
 
-**Status:** the FT is minted and held safe (ref
-`57296874…:0`, 100k units); covenant compiles; but the
-bare-vs-P2SH deploy model must be resolved before funding. This is the
-next concrete step — recompute the covenant as a bare ref-bearing
-scriptPubKey, then fund + run the attack-rejection proofs.
+## ⚠️ DEEPER finding (2026-05-20) — an FT cannot move into an arbitrary ref-bearing covenant
+
+Recomputed the covenant as a **bare** scriptPubKey (it correctly leads
+with `OP_PUSHINPUTREF <REF>`, confirmed) and built the funding tx
+(FT input → covenant output carrying the ref). The funding dry-run
+(`testmempoolaccept`) **rejected** with:
+
+```
+19: bad-txns-inputs-outputs-invalid-transaction-reference-operations-mempool
+```
+
+The refs match exactly (verified byte-for-byte), so this is NOT a ref
+mismatch — it is a **conservation-structure** problem:
+
+- A Radiant FT is bound to **its own code-script** (the
+  `dec0e9aa…` FT-CSH epilogue). Conservation is enforced as
+  `codeScriptValueSum(FT-code-script, inputs) ==
+  codeScriptValueSum(FT-code-script, outputs)` — i.e. the FT value must
+  flow to outputs **carrying the same FT code-script**.
+- My covenant output declares the ref via `OP_PUSHINPUTREF <REF>` but
+  is a *swap covenant script*, NOT the FT's code-script. So the FT's
+  `codeScriptValueSum` drops to zero on the output side → conservation
+  violation → rejected. (Caught in **dry-run** — the FT was NOT burned.)
+
+**Implication — this is an architecture-level constraint, not a bug:**
+you cannot lock an FT into an arbitrary covenant by simply declaring
+its ref. The FT is welded to its FT-CSH code-script. To hold an FT in
+a covenant, the covenant output must EITHER:
+
+1. **Be the FT code-script itself**, with the swap logic layered so the
+   covenant controls the *spend* of a normal FT UTXO (e.g. the covenant
+   key/condition is what the FT's P2PKH-prefix checks) — i.e. wrap the
+   covenant *inside* the FT script's spend path, not the FT inside the
+   covenant; or
+2. Use a **different token model** (NFT singleton, or a mutable/contract
+   ref) whose conservation rule the covenant can satisfy; or
+3. Have the covenant satisfy the FT's `codeScriptValueSum` by being
+   counted as an equivalent code-script (likely not possible for an
+   arbitrary script).
+
+Option 1 is the probable path and it **inverts the design**: rather
+than "lock the FT into the swap covenant," the swap condition must be
+expressed *within* an FT-shaped output (or a covenant that re-emits the
+exact FT code-script on settlement while gating the spend). This needs
+genuine redesign + a likely fresh divergent-review pass.
+
+**Status:** FT minted and **held safe** (ref `57296874…:0`,
+100k units — dry-run rejection means nothing was burned). Covenant
+compiles with correct hardening opcodes. The blocker is now an
+architecture question, not a coding one: *how does an FT-CSH-conserved
+token get held by a swap covenant?* That is the next session's design
+problem — resolve it (read Radiant Core's conservation algorithm and
+how Photonic's swap.ts actually moves FTs, since swap.ts is UI-level
+pre-signed txs, NOT a holding covenant — which may itself be the
+answer: maybe FTs are never *held* in a covenant, only moved by
+pre-signed atomic txs).
 
 ---
 

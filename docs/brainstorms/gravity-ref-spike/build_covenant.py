@@ -5,7 +5,6 @@ import json
 import sys
 
 from pyrxd.glyph.types import GlyphRef
-from pyrxd.gravity.codehash import compute_p2sh_address_from_redeem, compute_p2sh_script_pubkey
 from pyrxd.security.types import Hex20
 from pyrxd.keys import PrivateKey
 
@@ -52,16 +51,17 @@ for name, val in subs.items():
     redeem_hex = redeem_hex.replace(f"<{name}>", val)
 
 assert "<" not in redeem_hex, f"unfilled placeholder remains: {redeem_hex}"
-redeem = bytes.fromhex(redeem_hex)
+covenant_spk = bytes.fromhex(redeem_hex)
 
-p2sh_spk = compute_p2sh_script_pubkey(redeem)
-p2sh_addr = compute_p2sh_address_from_redeem(redeem)
+# BARE deployment: the covenant scriptPubKey IS the substituted covenant
+# bytecode. It leads with OP_PUSHINPUTREF <REF>, so the funded UTXO exposes
+# the ref opcode (conservation satisfied). NO P2SH wrap — that would hide the
+# ref behind a914<hash>87 and burn it.
+assert covenant_spk[:1] == b"\xd0", "covenant must lead with OP_PUSHINPUTREF (0xd0)"
 
 print(json.dumps({
-    "redeem_hex": redeem_hex,
-    "redeem_len": len(redeem),
-    "p2sh_spk_hex": p2sh_spk.hex(),
-    "p2sh_address": p2sh_addr,
+    "covenant_spk_hex": covenant_spk.hex(),
+    "covenant_spk_len": len(covenant_spk),
     "ref_wire_hex": ref_wire.hex(),
     "taker_pkh": taker_pkh.hex(),
     "maker_pkh": maker_pkh.hex(),
