@@ -644,3 +644,90 @@ a design-by-inference question.
 **Do not write the Python tx builders or the BTC half until the FT
 conservation question (1) is answered on a real regtest spend.** That
 is the load-bearing unknown; everything downstream depends on it.
+
+---
+
+## Phase 1 design note — custody mechanism RESOLVED (2026-05-20)
+
+This is the Phase-1 deliverable from
+[2026-05-20-feat-gravity-ft-covenant-spend-path-plan.md](../plans/2026-05-20-feat-gravity-ft-covenant-spend-path-plan.md).
+The load-bearing conservation question is **answered from the consensus
+source** (not regtest yet — that is the Phase-2 confirmation), and it
+answers favorably: **mechanism 1a is viable by construction.**
+
+### The reframed question, answered from source
+
+`getCodeScriptHashValueSum*` groups outputs/UTXOs by their
+**`codeScriptHash`**. That hash is computed in
+`Radiant-Core/src/script/script_execution_context.h:275-285`:
+
+```cpp
+// Create the codeScriptHash
+if (stateSeperatorByteIndex >= script.size()) {
+    ... hash of empty tail ...
+} else {
+    CScript::const_iterator scriptStateSeperatorIterator =
+        script.begin() + stateSeperatorByteIndex;
+    CHashWriter ...;
+    hashWriter << CFlatData(CScript(scriptStateSeperatorIterator, script.end()));
+    scriptSummary.codeScriptHash = hashWriter.GetHash();
+}
+```
+
+The hash covers **`script.begin() + stateSeperatorByteIndex` → `end()`**
+— i.e. the bytes **from `OP_STATESEPARATOR` (`0xbd`) onward**. Everything
+*before* the separator (the prologue: P2PKH or covenant) is **excluded
+from the codeScriptHash**.
+
+`stateSeperatorByteIndex` is the position of the single
+`OP_STATESEPARATOR`, located by `GetPushRefs`
+(`src/script/script.cpp:609-624,644`); two separators → `GetPushRefs`
+returns false → tx rejected; zero separators → index 0 (whole script
+hashed).
+
+### Consequence — 1a works by construction
+
+For an FT `prologue ‖ bd ‖ d0 <ref> ‖ dec0e9aa76e378e4a269e69d`:
+
+- `codeScriptHash = hash( bd d0 <ref> dec0e9aa76e378e4a269e69d )` —
+  the separator + ref-push + FT-CSH epilogue. **Prologue-independent.**
+- A **covenant-prologue** FT input
+  (`<covenant-condition> bd d0 <ref> dec0…`) and a **standard-P2PKH-prologue**
+  FT output (`76a914<pkh>88ac bd d0 <ref> dec0…`) therefore share the
+  **same** `codeScriptHash` ⇒ `codeScriptHashValueSum` counts them
+  together ⇒ **they conserve.**
+
+This is exactly what Option A needs: gate the spend via the prologue
+(which is not hashed), settle to the standard FT script
+(`build_ft_locking_script`, the one `EXPECTED_TAKER_FT_HASH` is computed
+from), and conservation holds.
+
+### Decisions locked
+
+1. **Mechanism: 1a** (covenant condition replaces/precedes the P2PKH
+   prologue, *before* the `bd` separator). 1b is rejected (no on-chain
+   custody — see plan C2).
+2. **Prologue constraint (hard):** the covenant prologue must contain
+   **no `OP_STATESEPARATOR` (`0xbd`) in opcode position** before the
+   FT epilogue's separator — otherwise `GetPushRefs` takes the wrong
+   boundary (or fails on a second separator), shifting/breaking the
+   `codeScriptHash`. The prologue must also contain no stray ref-opcode
+   bytes in opcode position (phantom-ref guard already covers this).
+3. **Custody invariant (C1):** the covenant has **exactly two spend
+   paths** — finalize-on-SPV-proof and forfeit-after-CLTV — and **no
+   Maker-only pre-deadline reclaim**. The existing RXD covenant's
+   `cancel()` branch is NOT inherited.
+4. **Settlement output:** the standard FT script for the destination
+   pkh (`build_ft_locking_script(dest_pkh, genesis_ref)`); covenant
+   asserts `hash256(outputs[0].lockingBytecode) == EXPECTED_*_FT_HASH`.
+
+### Still unproven (Phase 2 must confirm on a real node)
+
+The source says 1a *should* conserve. Phase 2 must still
+`testmempoolaccept` an actual covenant-prologue FT spend → standard-FT
+output and confirm: (a) no `OP_NUMEQUALVERIFY`/conservation failure,
+(b) the prologue's bytes are genuinely outside the hashed region in
+practice (no off-by-one at the separator index), (c) all negative cases
+(no-cancel, SPV-reuse, ==-not->= amount) reject. The source read
+de-risks the unknown from "unknown" to "very likely yes" — it does not
+replace the on-chain proof.

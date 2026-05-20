@@ -248,10 +248,22 @@ No further action; listed so the phase numbering reflects reality.
 
 ---
 
-#### Phase 1 — Resolve the custody mechanism on paper (design, ½–1 day)
+#### Phase 1 — Resolve the custody mechanism on paper (design, ½–1 day) — ✅ DONE 2026-05-20
 
-**Goal:** pin down *exactly* how an FT UTXO becomes covenant-gated while
-staying FT-shaped. The FT script is
+**Resolved favorably from the consensus source** (see the Phase-1 design
+note appended to
+[2026-05-19-gravity-ref-covenant-design.md](../brainstorms/2026-05-19-gravity-ref-covenant-design.md)).
+The FT `codeScriptHash` is computed from the bytes **`OP_STATESEPARATOR`
+onward** (`script_execution_context.h:275-285`), **excluding the
+prologue** — so a covenant-prologue FT input and a standard-P2PKH-prologue
+FT output share a `codeScriptHash` and conserve. **Mechanism 1a is viable
+by construction.** Decisions locked: 1a (not 1b); prologue must contain no
+`0xbd` in opcode position before the epilogue separator; custody invariant
+(exactly 2 spend paths, no Maker `cancel`); settle to the standard FT
+script via hash-compare. Phase 2 must still confirm on a real node.
+
+**Goal (original):** pin down *exactly* how an FT UTXO becomes
+covenant-gated while staying FT-shaped. The FT script is
 `76a914<pkh>88ac bd d0 <ref> dec0…9d`: the **P2PKH prologue** is *before*
 `OP_STATESEPARATOR` (`bd`); the **code-script** that the conservation
 epilogue hashes (`getCodeScriptHashValueSumOutputs`,
