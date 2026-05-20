@@ -1,0 +1,43 @@
+pragma radiantscript ^0.1.0;
+
+// GravityFtPrologue — mechanism 1a: the swap covenant as the PROLOGUE of an
+// FT script. The funded UTXO is:  <this compiled prologue> bd d0 <ref> dec0…
+// The bd..epilogue (appended, not compiled here) is the FT identity and runs
+// its own codeScriptHashValueSum conservation. This prologue ONLY gates the
+// spend: settle -> taker FT, or forfeit -> maker FT after the deadline.
+//
+// Hardening (output-side, belt-and-suspenders with the FT epilogue):
+//   outputs.length == 1, refOutputCount(ref) == 1, refValueSum(ref) == AMOUNT.
+// Output validation by hash-compare (no embedded FT bytes -> no phantom ref).
+// NO cancel branch (custody invariant C1).
+//
+// MUST contain no bare 0xbd (OP_STATESEPARATOR) in opcode position so the
+// appended epilogue's bd is the codeScriptHash boundary.
+
+contract GravityFtPrologue(
+    bytes36 REF,                    // FT genesis ref (also pushed by the epilogue)
+    int AMOUNT,                     // exact FT units to deliver
+    bytes32 EXPECTED_TAKER_FT_HASH, // hash256 of the taker-destination FT script
+    bytes20 MAKER_PKH,              // maker key (forfeit auth)
+    bytes32 EXPECTED_MAKER_FT_HASH, // hash256 of the maker-destination FT script
+    int DEADLINE                    // locktime after which forfeit is allowed
+)
+function () {
+    bytes36 ref = pushInputRef(REF);
+    require(tx.outputs.length == 1);
+    require(tx.outputs.refOutputCount(ref) == 1);
+    require(tx.outputs.refValueSum(ref) == AMOUNT);
+
+    return {
+        settle(sig s, pubkey pk) {
+            require(checkSig(s, pk));
+            require(hash256(tx.outputs[0].lockingBytecode) == EXPECTED_TAKER_FT_HASH);
+        },
+        forfeit(sig makerSig, pubkey makerPk) {
+            require(hash160(makerPk) == MAKER_PKH);
+            require(checkSig(makerSig, makerPk));
+            require(tx.time >= DEADLINE);
+            require(hash256(tx.outputs[0].lockingBytecode) == EXPECTED_MAKER_FT_HASH);
+        }
+    };
+}

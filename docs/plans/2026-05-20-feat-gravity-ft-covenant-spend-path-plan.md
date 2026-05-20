@@ -326,9 +326,31 @@ real Radiant Core node, that the covenant-gated FT can be:
 (no `OP_NUMEQUALVERIFY` failure — the exact error the spike hit), and
 (c) reclaimed by the Maker after the CLTV deadline.
 
-**Tasks:**
-- [ ] Implement the Phase-1 custody mechanism as a throwaway harness
-  (extend the spike scripts; keep in `docs/brainstorms/gravity-ref-spike/`).
+**Progress (2026-05-20):**
+- [x] **Covenant-prologue designed + byte-verified** (mechanism 1a).
+  `docs/brainstorms/gravity-ref-spike/GravityFtPrologue.rxd` +
+  `.artifact.json` (compiled `rxdc 0.1.0`). The funded UTXO is
+  `<prologue> bd d0 <ref> dec0e9aa76e378e4a269e69d`. Verified statically:
+  (a) the compiled prologue has **no bare `0xbd`** in opcode position
+  (the `0xbd` bytes inside the two `EXPECTED_*_FT_HASH` push-32 operands
+  are skipped); (b) the full 217-byte script has **exactly one**
+  opcode-position `0xbd`, at offset 167 = the epilogue separator, so
+  `codeScriptHash = hash(bd d0 <ref> dec0…)` is **byte-identical to a
+  standard FT's** → conserves by construction; (c) **exactly one distinct
+  ref** (the genesis ref; prologue push + epilogue push dedup) → no
+  phantom. Confirmed `OP_STATESEPARATOR` is a NOP at execution
+  (`interpreter.cpp:1975`), so prologue gating + epilogue conservation
+  both run in sequence. Two spend paths (settle/forfeit), no cancel.
+
+**Remaining tasks (the on-chain legs):**
+- [ ] Leg A (conservation proof): transfer the standard test FT → a
+  covenant-prologue FT output; `testmempoolaccept`. Confirms (b) on a
+  real node (no off-by-one at the separator index).
+- [ ] Leg B (release proof): spend the covenant-prologue FT via `settle`
+  → standard taker FT output; `testmempoolaccept`. Exercises the
+  covenant spend logic + hash-compare.
+- [ ] Implement the throwaway harness for both legs (extend the spike
+  scripts; keep in `docs/brainstorms/gravity-ref-spike/`).
 - [ ] Build the 2-input settlement tx: input[0] = covenant-gated FT
   UTXO, scriptSig carries the (eventual) SPV proof / settlement
   selector; output[0] = exact taker FT code-script. Run

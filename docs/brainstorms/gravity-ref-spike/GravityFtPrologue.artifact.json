@@ -1,0 +1,68 @@
+{
+  "version": 9,
+  "compilerVersion": "rxdc 0.1.0",
+  "contract": "GravityFtPrologue",
+  "abi": [
+    {
+      "type": "function",
+      "name": "settle",
+      "index": 0,
+      "params": [
+        {
+          "name": "s",
+          "type": "Sig"
+        },
+        {
+          "name": "pk",
+          "type": "PubKey"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "forfeit",
+      "index": 1,
+      "params": [
+        {
+          "name": "makerSig",
+          "type": "Sig"
+        },
+        {
+          "name": "makerPk",
+          "type": "PubKey"
+        }
+      ]
+    },
+    {
+      "type": "constructor",
+      "params": [
+        {
+          "name": "REF",
+          "type": "bytes"
+        },
+        {
+          "name": "AMOUNT",
+          "type": "int"
+        },
+        {
+          "name": "EXPECTED_TAKER_FT_HASH",
+          "type": "Sha256"
+        },
+        {
+          "name": "MAKER_PKH",
+          "type": "Ripemd160"
+        },
+        {
+          "name": "EXPECTED_MAKER_FT_HASH",
+          "type": "Sha256"
+        },
+        {
+          "name": "DEADLINE",
+          "type": "int"
+        }
+      ]
+    }
+  ],
+  "asm": "OP_PUSHINPUTREF $REF OP_TXOUTPUTCOUNT OP_1 OP_NUMEQUALVERIFY OP_DUP OP_REFOUTPUTCOUNT_OUTPUTS OP_1 OP_NUMEQUALVERIFY OP_REFVALUESUM_OUTPUTS $AMOUNT OP_NUMEQUALVERIFY OP_DUP OP_0 OP_NUMEQUAL OP_IF OP_ROT OP_ROT OP_CHECKSIGVERIFY OP_0 OP_OUTPUTBYTECODE OP_HASH256 $EXPECTED_TAKER_FT_HASH OP_EQUAL OP_NIP OP_ELSE OP_1 OP_NUMEQUALVERIFY OP_DUP OP_HASH160 $MAKER_PKH OP_EQUALVERIFY OP_CHECKSIGVERIFY $DEADLINE OP_CHECKLOCKTIMEVERIFY OP_DROP OP_0 OP_OUTPUTBYTECODE OP_HASH256 $EXPECTED_MAKER_FT_HASH OP_EQUAL OP_ENDIF",
+  "hex": "d0<REF>c4519d76de519ddc<AMOUNT>9d76009c637b7bad00cdaa<EXPECTED_TAKER_FT_HASH>877767519d76a9<MAKER_PKH>88ad<DEADLINE>b17500cdaa<EXPECTED_MAKER_FT_HASH>8768"
+}
