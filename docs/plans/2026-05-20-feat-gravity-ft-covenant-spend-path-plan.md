@@ -317,7 +317,31 @@ invariant, and the reframed conservation question to test. **No code.**
 
 ---
 
-#### Phase 2 — On-chain proof gate (regtest + mainnet dry-run) — HARD GATE
+#### Phase 2 — On-chain proof gate (regtest + mainnet dry-run) — ✅ PASSED 2026-05-20 (Radiant-only)
+
+**RESULT: the Radiant-only covenant is fully proven on the live mainnet
+node.** Mechanism 1a is validated. Details:
+- **Leg A (conservation) — broadcast**, txid `22912a58…`. Standard test
+  FT → covenant-prologue FT UTXO conserves (the Phase-1 source claim,
+  now empirical). The test FT now lives in the covenant-prologue UTXO.
+- **Leg B (release) — `testmempoolaccept` allowed**, txid `069c46c8…`.
+  The `settle` path executes sig + 3 hardening constraints + hash-compare
+  + FT epilogue conservation; FT released to taker as a standard FT.
+- **Negative-case matrix — ALL reject on-chain:** `extra_output` →
+  output-count clamp; `wrong_taker` → hash-compare false top stack;
+  `short_amount` → `refValueSum==AMOUNT`; `cancel_attempt` (selector
+  OP_2) → no third branch (**C1 custody invariant confirmed** — no
+  Maker-only pre-deadline reclaim).
+
+**Caveat (honesty):** this covenant has **no BTC/SPV gate yet** — the
+`settle` path is gated by a sig only (keeps the spike tx well-formed).
+The BTC-payment requirement (SPV proof) is spliced in at Phase 4, and the
+on-chain SPV-reuse binding (H1) is proven then. The conservation +
+custody + hardening half is done; the cross-chain atomicity half is not.
+
+Original goal/tasks below (retained for the record):
+
+**Goal (original):** prove, by `testmempoolaccept` (or confirmed broadcast)
 
 **Goal:** prove, by `testmempoolaccept` (or confirmed broadcast) on a
 real Radiant Core node, that the covenant-gated FT can be:

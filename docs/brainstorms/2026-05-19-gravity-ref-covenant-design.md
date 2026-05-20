@@ -731,3 +731,52 @@ practice (no off-by-one at the separator index), (c) all negative cases
 (no-cancel, SPV-reuse, ==-not->= amount) reject. The source read
 de-risks the unknown from "unknown" to "very likely yes" — it does not
 replace the on-chain proof.
+
+---
+
+## Phase 2 — RADIANT-ONLY COVENANT PROVEN ON-CHAIN (2026-05-20)
+
+Mechanism 1a is validated on the live mainnet node (`ssh tr`). The
+covenant-prologue FT (`GravityFtPrologue` compiled + `bd d0 <ref>
+dec0e9aa76e378e4a269e69d` epilogue, 217 B) was exercised end-to-end.
+
+**Leg A — conservation (broadcast).** Standard test FT
+`57296874…:0` → covenant-prologue FT UTXO. `sendrawtransaction` →
+txid `22912a58196dbf627b3db631d151af5f4c69922e3c69635f0d5ed6b383abc594`,
+vout 0 = the 100k-photon covenant-prologue FT. Confirms the Phase-1
+source prediction empirically: a covenant-prologue (custom-prologue) FT
+output shares the standard FT's `codeScriptHash` and conserves.
+
+**Leg B — release (`testmempoolaccept` allowed).** Spend the
+prologue-FT via `settle` (selector OP_0, taker sig) → standard taker FT
+output. txid `069c46c8…`, `"allowed": true`. Executes the full path:
+taker `OP_CHECKSIGVERIFY`, the 3 hardening constraints
+(`outputs.length==1`, `refOutputCount==1`, `refValueSum==AMOUNT`), the
+hash-compare (`hash256(output[0]) == EXPECTED_TAKER_FT_HASH`), and the FT
+epilogue conservation — all pass.
+
+**Negative-case matrix — all reject on-chain** (`build_leg_b_negatives.py`):
+
+| Case | reject-reason | constraint |
+|---|---|---|
+| `extra_output` (2 outputs) | OP_NUMEQUALVERIFY | output-count clamp |
+| `wrong_taker` (FT to attacker pkh) | false top stack | hash-compare |
+| `short_amount` (value = AMOUNT-1) | OP_NUMEQUALVERIFY | refValueSum==AMOUNT |
+| `cancel_attempt` (selector OP_2) | OP_NUMEQUALVERIFY | no third branch — **C1** |
+
+`cancel_attempt` proves the **custody invariant**: selectors other than
+settle(0)/forfeit(1) hit `OP_1 OP_NUMEQUALVERIFY` in the else-branch and
+fail. There is no Maker-only pre-deadline reclaim — the day-1 theft the
+divergent review caught (C1) is structurally impossible.
+
+**What is NOT yet proven:** this covenant has **no BTC/SPV gate** — the
+`settle` path is gated by a taker sig only (keeps the spike tx
+well-formed). The BTC-payment requirement (SPV proof) and the on-chain
+SPV-reuse binding (H1) are Phase-4 work. The conservation + custody +
+hardening half is done; cross-chain atomicity is not.
+
+**Asset state:** Leg A is broadcast, so the test FT now lives in the
+covenant-prologue UTXO `22912a58…:0`, recoverable via `settle` (taker
+key) or `forfeit` (maker key, after CLTV deadline 430806). Harnesses:
+`build_prologue_ft.py`, `build_leg_a.py`, `build_leg_b.py`,
+`build_leg_b_negatives.py`.
