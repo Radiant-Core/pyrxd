@@ -1028,3 +1028,27 @@ cross-chain-atomicity halves are all validated on mainnet consensus.
 rejection test (fund two covenants with different derived `btcReceiveHash`,
 one proof → A accepts / B rejects); production builders + golden vectors;
 `--ft` generator mode; then external audit before mainnet activation.
+
+### Phase 4 — H1 SPV-proof-reuse PROVEN closed on-chain (2026-05-20)
+
+The per-offer-derived `btcReceiveHash` binding is now empirically validated
+on the live mainnet node, with both controls:
+
+- **Distinct covenants:** covenant A (`btcReceiveHash` = `25db43…`) and
+  covenant B (`btcReceiveHash` = `140b40…`) compile to **different**
+  scriptPubKeys → different covenant addresses (the binding is structural,
+  not entropy-based).
+- **Negative (the security property):** funded covenant B (`eeae386a…`),
+  attempted `finalize` with the SPV proof that pays **A** → REJECTED with
+  `mandatory-script-verify-flag-failed (OP_EQUALVERIFY)`, exactly at the
+  covenant's `require(hash == btcReceiveHash)` payment check. **A payment
+  to offer A's address cannot settle offer B.**
+- **Positive control:** a freshly-mined proof paying **B** → covenant B
+  `finalize` ACCEPTED (`2d5c332d…`, broadcast). So the rejection is
+  specifically the address mismatch, not an incidental failure.
+
+**Conclusion:** the SPV-proof-reuse attack (security review H1) is closed
+on-chain by construction. Since each offer's per-offer-derived
+`btcReceiveHash` produces a distinct covenant that only honors a payment
+to its own committed address, one BTC payment cannot drain two concurrent
+offers. This was the last security-critical on-chain proof.
