@@ -539,7 +539,22 @@ documented Pyodide lazy-import goal ([__init__.py:21-31](../../src/pyrxd/__init_
 
 *Only after Phase 2 passes.*
 
-**Tasks:**
+**Progress (2026-05-20):**
+- [x] **Fused covenant built + compiled + both static guards pass**
+  (`fuse_ft_covenant.py` → `GravityFtCovenant.rxd/.artifact.json`,
+  `rxdc 0.1.0`, ~4.9KB). H1 binding designed (per-offer derived
+  `btcReceiveHash`). (commits `a30ed24`, `8d72265`)
+- [x] **Fused covenant FUNDS + FORFEITS on-chain (real broadcasts):**
+  funding `5a9cfc47…` (standard FT → fused covenant, conserves); forfeit
+  `f0d8c4fe…` (CLTV, selector OP_1 → standard maker FT, recovered). Learned
+  the forfeit scriptSig is bare `OP_1` (no sig — CLTV-gated; anyone can
+  broadcast after deadline).
+- [ ] **REMAINING:** the `finalize`/settle path with a REAL SpvProof
+  (real mainnet BTC headers + payment matching baked `btcChainAnchor`/
+  `nBits`); the H1 two-offer-rejection test; production builders + golden
+  vectors; `--ft` mode on the generator (currently a post-process transform).
+
+**Original tasks (retained):**
 - [ ] Merge the SPV-proof + `btcReceiveType` clauses from the sentinel
   covenant into the Phase-2 hash-compare FT covenant. Recompile to
   `maker_covenant_ft_v1.artifact.json`. Re-run the phantom-ref guard on

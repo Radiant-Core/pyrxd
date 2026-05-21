@@ -964,3 +964,32 @@ on-chain, harmless (they'd be the same covenant address).
   derived `btcReceiveHash`, build one SPV proof of payment to A's address,
   show A's `finalize` accepts and B's `finalize` **rejects** the same
   proof. This is the H1 blocker test, run at the Phase-4 on-chain gate.
+
+### Phase 4 — fused covenant FUNDS + FORFEITS on-chain (2026-05-20)
+
+The fully-substituted fused FT covenant (~4.9KB) was exercised on the live
+mainnet node with real broadcasts:
+
+- **Funding (broadcast `5a9cfc47…`):** standard FT → fused-covenant FT UTXO.
+  `testmempoolaccept` allowed, then broadcast. Re-confirms conservation on
+  the production-shaped covenant (not just the bare Phase-2 prologue). The
+  funding tx is ~5.3KB (the covenant output is ~4.9KB) → ~53M-photon fee at
+  the 10k/byte floor; size is the real cost of the SPV half.
+- **Forfeit (broadcast `f0d8c4fe…`):** spend the fused covenant via `forfeit`
+  (selector OP_1, CLTV `tx.time >= claimDeadline`, nLockTime 1779000000) →
+  standard MAKER FT output. `testmempoolaccept` allowed, broadcast; FT
+  recovered to the maker as a standard FT, conserving.
+
+**Forfeit scriptSig discipline (learned on-chain):** `forfeit()` takes NO
+params and does NO sig check — it is gated by CLTV alone (anyone may
+broadcast after the deadline; the FT goes to the maker's FT address
+regardless, matching production `forfeit()` and the trust-minimized model).
+A first attempt pushed `<makerSig> <makerPk> OP_1` and was rejected with
+`non-mandatory-script-verify-flag (Extra items left on stack)` — the branch
+never consumes a sig. Correct scriptSig is the bare `OP_1` selector (bare
+covenant → no redeem-script push).
+
+**Still unproven on-chain:** the `finalize` (settle) path with a real SPV
+proof, and the H1 two-offer-rejection test. Forfeit needs no BTC proof, so
+it proved the funding + conservation + FT-recovery half of the fused
+covenant; finalize is the remaining cross-chain leg.
