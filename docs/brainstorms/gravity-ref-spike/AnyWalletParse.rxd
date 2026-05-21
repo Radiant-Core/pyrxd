@@ -1,9 +1,13 @@
 pragma radiantscript ^0.1.0;
 
-// Any-wallet BTC payment parser v2: variable-length outputs (read each
-// output's scriptLen varint to advance), scan for a P2WPKH payment.
-// Caps: <=3 native-segwit inputs, <=3 outputs. Unrolled.
-contract ParseTest2(
+// Any-wallet BTC payment parser v3: per-input variable scriptSig length
+// (handles native-segwit/P2TR empty 0x00 AND P2SH-P2WPKH 23-byte scriptSig),
+// variable-length outputs, scan for the P2WPKH payment anywhere.
+// Caps: <=4 inputs, <=4 outputs (covers the vast majority of real txs;
+// a tx exceeding caps is a LIVENESS limit — consolidate/trim — not a safety hole).
+// Safety: rawTx is Merkle-pinned upstream, so parsing it is forgery-proof;
+// the covenant computes every offset itself (no attacker offset arg).
+contract ParseV3(
     bytes btcReceiveHash,   // 20-byte p2wpkh hash
     int btcSatoshis
 )
@@ -12,35 +16,41 @@ function () {
         check(bytes rawTx) {
             int nIn = int(rawTx.split(4)[1].split(1)[0]);
             require(nIn >= 1);
-            require(nIn <= 3);
+            require(nIn <= 4);                 // input-count cap (1-byte varint only)
             int pos = 5;
-            require(rawTx.split(pos + 36)[1].split(1)[0] == 0x00);  // native segwit input 1
-            pos = pos + 41;
-            if (nIn >= 2) { require(rawTx.split(pos + 36)[1].split(1)[0] == 0x00); pos = pos + 41; }
-            if (nIn >= 3) { require(rawTx.split(pos + 36)[1].split(1)[0] == 0x00); pos = pos + 41; }
+            // Skip input 1: 36 outpoint + scriptSigLen varint(1) + scriptSig + 4 seq.
+            int ssl1 = int(rawTx.split(pos + 36)[1].split(1)[0]);
+            pos = pos + 36 + 1 + ssl1 + 4;
+            if (nIn >= 2) { int ssl2 = int(rawTx.split(pos + 36)[1].split(1)[0]); pos = pos + 36 + 1 + ssl2 + 4; }
+            if (nIn >= 3) { int ssl3 = int(rawTx.split(pos + 36)[1].split(1)[0]); pos = pos + 36 + 1 + ssl3 + 4; }
+            if (nIn >= 4) { int ssl4 = int(rawTx.split(pos + 36)[1].split(1)[0]); pos = pos + 36 + 1 + ssl4 + 4; }
+            // output count
             int nOut = int(rawTx.split(pos)[1].split(1)[0]);
             require(nOut >= 1);
-            require(nOut <= 3);
+            require(nOut <= 4);
             pos = pos + 1;
             bool found = false;
-            // output 1: value(8) + scriptLen(1) + script(scriptLen)
+            // Each output: value(8) + scriptLen varint(1) + script(scriptLen).
             int v1 = int(rawTx.split(pos)[1].split(8)[0]);
             int sl1 = int(rawTx.split(pos + 8)[1].split(1)[0]);
-            bytes spk1 = rawTx.split(pos + 9)[1].split(sl1)[0];
-            if (sl1 == 22) { if (spk1.split(2)[0] == 0x0014) { if (spk1.split(2)[1] == btcReceiveHash) { if (v1 >= btcSatoshis) { found = true; } } } }
+            if (sl1 == 22) { if (rawTx.split(pos + 9)[1].split(2)[0] == 0x0014) { if (rawTx.split(pos + 11)[1].split(20)[0] == btcReceiveHash) { if (v1 >= btcSatoshis) { found = true; } } } }
             pos = pos + 9 + sl1;
             if (nOut >= 2) {
                 int v2 = int(rawTx.split(pos)[1].split(8)[0]);
                 int sl2 = int(rawTx.split(pos + 8)[1].split(1)[0]);
-                bytes spk2 = rawTx.split(pos + 9)[1].split(sl2)[0];
-                if (sl2 == 22) { if (spk2.split(2)[0] == 0x0014) { if (spk2.split(2)[1] == btcReceiveHash) { if (v2 >= btcSatoshis) { found = true; } } } }
+                if (sl2 == 22) { if (rawTx.split(pos + 9)[1].split(2)[0] == 0x0014) { if (rawTx.split(pos + 11)[1].split(20)[0] == btcReceiveHash) { if (v2 >= btcSatoshis) { found = true; } } } }
                 pos = pos + 9 + sl2;
             }
             if (nOut >= 3) {
                 int v3 = int(rawTx.split(pos)[1].split(8)[0]);
                 int sl3 = int(rawTx.split(pos + 8)[1].split(1)[0]);
-                bytes spk3 = rawTx.split(pos + 9)[1].split(sl3)[0];
-                if (sl3 == 22) { if (spk3.split(2)[0] == 0x0014) { if (spk3.split(2)[1] == btcReceiveHash) { if (v3 >= btcSatoshis) { found = true; } } } }
+                if (sl3 == 22) { if (rawTx.split(pos + 9)[1].split(2)[0] == 0x0014) { if (rawTx.split(pos + 11)[1].split(20)[0] == btcReceiveHash) { if (v3 >= btcSatoshis) { found = true; } } } }
+                pos = pos + 9 + sl3;
+            }
+            if (nOut >= 4) {
+                int v4 = int(rawTx.split(pos)[1].split(8)[0]);
+                int sl4 = int(rawTx.split(pos + 8)[1].split(1)[0]);
+                if (sl4 == 22) { if (rawTx.split(pos + 9)[1].split(2)[0] == 0x0014) { if (rawTx.split(pos + 11)[1].split(20)[0] == btcReceiveHash) { if (v4 >= btcSatoshis) { found = true; } } } }
             }
             require(found);
         }

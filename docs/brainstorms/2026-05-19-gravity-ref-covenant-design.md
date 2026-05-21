@@ -1132,3 +1132,39 @@ bounded. The fused FT covenant is already ~4.9KB; this adds to funding fee
 **Status:** designed, not built. The existing constrained covenant remains
 the proven one (single-input P2WPKH/P2TR/P2SH-P2WPKH). The live FT offer
 `85ae317e…:0` uses the constrained covenant and is forfeitable.
+
+### Any-wallet parser — prototype validated (2026-05-21)
+
+`AnyWalletParse.rxd` (rxdc 0.1.0, ~565 B standalone) implements the design:
+per-input scriptSigLen-varint skip (caps: ≤4 inputs), output-count varint,
+then a per-output scriptLen-varint scan (caps: ≤4 outputs) for a P2WPKH
+output paying `btcReceiveHash` ≥ `btcSatoshis` at ANY position. Compiles
+clean. `validate_anywallet_parse.py` confirms the offset arithmetic on:
+- a 2-input native-segwit tx, change-FIRST (payment at out[1]);
+- a 3-input MIXED tx (P2SH-P2WPKH 23-byte scriptSig + 2 native segwit), with
+  the payment in the MIDDLE output (P2PKH change, payment, P2TR change).
+Both find the payment; wrong-hash and insufficient-value are rejected.
+
+**Caps (liveness, not safety):** ≤4 inputs, ≤4 outputs, single-byte
+varints only (`< 0xfd` ⇒ ≤252 — but capped at 4 to bound unrolled script
+size). A tx exceeding the caps is rejected; the taker consolidates UTXOs or
+trims change. These caps are tunable per generated covenant (like Merkle
+depth). Pick the production caps with UX data; 4/4 covers the large majority
+of real wallet sends.
+
+**Input-type scope (must be in the audit + docs):** the parser navigates by
+each input's scriptSigLen, so it handles **segwit-style inputs** whose
+witness was stripped (native segwit / P2TR: empty scriptSig; P2SH-P2WPKH:
+fixed 23-byte scriptSig). **Legacy P2PKH inputs** carry sig+pubkey in the
+scriptSig (non-witness) — navigation by scriptSigLen still works, BUT the
+witness-strip / txid-binding semantics differ for non-segwit inputs and need
+explicit verification before claiming legacy-input support. v1 scope:
+segwit-input wallets (the modern default). Legacy-input support is a
+follow-on, gated on its own analysis.
+
+**Still required before this is real:** generalize the *output type* match
+(the prototype scans for P2WPKH payments; production should match the
+maker's chosen `btcReceiveType` like the existing 4-way block), integrate
+into the fused covenant generator (replace the fixed-offset payment block),
+static guards, on-chain proof with a real multi-input tx, and the external
+audit of the parsing path (hard gate).

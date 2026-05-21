@@ -61,3 +61,57 @@ if __name__ == "__main__":
     # negative: amount too high must NOT be found
     assert not parse_find_payment(tx, h, 20000), "false positive on insufficient value"
     print("any-wallet parser offset arithmetic: PASS (2-input, change-first, mixed types)")
+
+
+def build_mixed_input_tx(btc_hash: bytes, pay_sats: int) -> bytes:
+    """3 inputs (P2SH-P2WPKH 23B scriptSig + 2 native segwit), 3 outputs with
+    the P2WPKH payment in the MIDDLE (P2PKH change, payment, P2TR change)."""
+    import struct as _s
+
+    def inp(txid_b, vout, scriptsig):
+        return txid_b + _s.pack("<I", vout) + bytes([len(scriptsig)]) + scriptsig + b"\xff\xff\xff\xff"
+
+    def out(sats, spk):
+        return _s.pack("<Q", sats) + bytes([len(spk)]) + spk
+
+    in1 = inp(b"\xaa" * 32, 0, b"\x16\x00\x14" + b"\x33" * 20)  # P2SH-P2WPKH 23B
+    in2 = inp(b"\xbb" * 32, 1, b"")
+    in3 = inp(b"\xcc" * 32, 2, b"")
+    return (
+        _s.pack("<I", 2) + b"\x03" + in1 + in2 + in3
+        + b"\x03"
+        + out(55555, b"\x76\xa9\x14" + b"\x44" * 20 + b"\x88\xac")  # P2PKH change
+        + out(pay_sats, b"\x00\x14" + btc_hash)                      # P2WPKH payment (middle)
+        + out(99999, b"\x51\x20" + b"\x11" * 32)                     # P2TR change
+        + _s.pack("<I", 0)
+    )
+
+
+def parse_find_payment_v3(rawtx: bytes, btc_hash: bytes, min_sats: int) -> bool:
+    """v3 walk: per-input scriptSigLen-varint skip (handles P2SH-P2WPKH)."""
+    i = lambda b: int.from_bytes(b, "little")
+    pos = 4
+    n_in = rawtx[pos]
+    pos += 1
+    assert 1 <= n_in <= 4
+    for _ in range(n_in):
+        ssl = rawtx[pos + 36]
+        pos += 36 + 1 + ssl + 4
+    n_out = rawtx[pos]
+    pos += 1
+    found = False
+    for _ in range(n_out):
+        v = i(rawtx[pos : pos + 8])
+        sl = rawtx[pos + 8]
+        if sl == 22 and rawtx[pos + 9 : pos + 11] == b"\x00\x14" and rawtx[pos + 11 : pos + 31] == btc_hash and v >= min_sats:
+            found = True
+        pos += 9 + sl
+    return found
+
+
+if __name__ == "__main__":
+    h = bytes.fromhex("9995c9ac3bd932a75dca3229e3195c3544d5db36")
+    tx3 = build_mixed_input_tx(h, 10000)
+    assert parse_find_payment_v3(tx3, h, 10000), "v3 failed mixed-input tx"
+    assert not parse_find_payment_v3(tx3, b"\x00" * 20, 10000), "v3 false positive wrong hash"
+    print("any-wallet parser v3: PASS (3 mixed-type inputs incl P2SH-P2WPKH, payment mid-outputs)")
