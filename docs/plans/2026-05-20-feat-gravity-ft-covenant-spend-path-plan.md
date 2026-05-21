@@ -549,10 +549,16 @@ documented Pyodide lazy-import goal ([__init__.py:21-31](../../src/pyrxd/__init_
   `f0d8c4fe…` (CLTV, selector OP_1 → standard maker FT, recovered). Learned
   the forfeit scriptSig is bare `OP_1` (no sig — CLTV-gated; anyone can
   broadcast after deadline).
-- [ ] **REMAINING:** the `finalize`/settle path with a REAL SpvProof
-  (real mainnet BTC headers + payment matching baked `btcChainAnchor`/
-  `nBits`); the H1 two-offer-rejection test; production builders + golden
-  vectors; `--ft` mode on the generator (currently a post-process transform).
+- [x] **`finalize`/settle PROVEN on-chain** (funding `0518ab7e…`, finalize
+  `d7877fcb…`): a synthetic PoW-valid 6-header chain (anchor `0x99*32`,
+  nBits `0x1d7fffff`) suffices — the node runs the same checks as the
+  Python verifier, so it accepts iff the covenant bakes the matching
+  anchor/nBits. No real Bitcoin block needed. Covenant ran the full SPV
+  block + hardening + hash-compare + FT conservation; FT settled to taker.
+  **Both spend paths (forfeit + finalize-via-SPV) now proven end-to-end.**
+- [ ] **REMAINING:** the H1 two-offer-rejection test; production builders +
+  golden vectors; `--ft` mode on the generator (currently a post-process
+  transform).
 
 **Original tasks (retained):**
 - [ ] Merge the SPV-proof + `btcReceiveType` clauses from the sentinel

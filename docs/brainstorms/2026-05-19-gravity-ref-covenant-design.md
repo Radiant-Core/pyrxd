@@ -993,3 +993,38 @@ covenant → no redeem-script push).
 proof, and the H1 two-offer-rejection test. Forfeit needs no BTC proof, so
 it proved the funding + conservation + FT-recovery half of the fused
 covenant; finalize is the remaining cross-chain leg.
+
+### Phase 4 — finalize/settle PROVEN with a real SPV proof (2026-05-20)
+
+The fused FT covenant's `finalize` (SPV-gated settle) path is now proven on
+the live mainnet node — the cross-chain leg, completing the swap.
+
+**Approach.** A synthetic-but-PoW-valid chain (anchor `0x99*32`,
+nBits `0x1d7fffff`) is sufficient: the covenant runs the *same*
+PoW/Merkle/anchor checks the Python verifier does, so the node accepts it
+iff the covenant bakes the matching `btcChainAnchor`/`expectedNBits`. No
+real Bitcoin block needed — fetching one is unnecessary for the consensus
+proof. (`build_finalize_proof.py` mines 6 chained headers via the real
+`verify_header_pow` grinder; the payment's Merkle root is in h1, h2–h6 are
+filler. Verified against `SpvProofBuilder` before going on-chain.)
+
+**On-chain (real broadcasts):**
+- Funded the FT into a fused covenant baked with the proof's SPV params
+  (funding `0518ab7e…`).
+- `finalize` (`d7877fcb…`): covenant FT input + SPV scriptSig
+  (`<h1>..<h6> <branch 12-level sentinel-padded> <rawTx> OP_0`) + fee →
+  standard TAKER FT. `testmempoolaccept` allowed, then broadcast; FT
+  settled to the taker, conserving. The covenant executed the full SPV
+  block (anchor + 6× PoW + 12-level Merkle + P2WPKH payment to
+  `btcReceiveHash` ≥ `btcSatoshis`) + the 3 FT hardening constraints +
+  hash-compare + FT epilogue conservation.
+
+**Both spend paths of the fused FT↔BTC covenant are now proven end-to-end
+on a real mineable chain:** fund→forfeit (recovery) and
+fund→finalize-via-SPV (settle). The conservation + custody + hardening +
+cross-chain-atomicity halves are all validated on mainnet consensus.
+
+**Still remaining (designed, not yet on-chain):** the H1 two-offer-
+rejection test (fund two covenants with different derived `btcReceiveHash`,
+one proof → A accepts / B rejects); production builders + golden vectors;
+`--ft` generator mode; then external audit before mainnet activation.
