@@ -897,3 +897,70 @@ tx builders (reusing `build_finalize_tx`'s SPV scriptSig assembly), and the
 on-chain legs (fund → finalize-with-real-SPV-proof → forfeit → negatives).
 NOT yet proven on-chain — the guards are static; the spend still needs a
 real SPV proof + `testmempoolaccept`.
+
+---
+
+## Phase 4 — H1 SPV-proof-reuse binding design (2026-05-20)
+
+**Threat (security review, blocker).** `btcReceiveHash` and `btcSatoshis`
+are committed *constructor* params (baked into the covenant bytecode →
+part of the covenant address). The `finalize` SPV check is
+`require(value >= btcSatoshis); require(hash == btcReceiveHash)`
+(maker_covenant_trade.rxd:459/464). If two concurrent offers from the same
+maker commit the **same** `btcReceiveHash`, one real BTC payment satisfies
+**both** covenants' `finalize`. Since anyone can settle, an attacker
+observes the payment, grabs the proof, and drains *both* FTs with one BTC
+payment. An off-chain duplicate-address check is insufficient (the proof is
+valid on-chain for both).
+
+**Mitigation: per-offer derived BTC receive address. On-chain enforced by
+construction.**
+
+`btcReceiveHash := hash160( makerBtcChildPubkey(offerIndex) )` where
+`makerBtcChildPubkey` is a BIP32 child of the maker's BTC key at a
+per-offer index/path. pyrxd already has the machinery: `hd.bip32`
+(`ckd`, `Xprv`/`Xpub`) and BRC-42 `PublicKey.derive_child`
+(keys.py:125) — no new crypto.
+
+Why this closes H1 on-chain (not just off-chain):
+1. Each offer derives a **distinct** child pubkey → distinct
+   `btcReceiveHash` → since `btcReceiveHash` is a code-script param, a
+   **distinct covenant address**. Offer A and offer B are different
+   scripts at different addresses.
+2. Offer B's `finalize` runs `require(hash == btcReceiveHash_B)`. A proof
+   of payment to A's address carries `hash == btcReceiveHash_A != _B` →
+   **rejects**. One payment cannot satisfy two offers.
+3. The maker controls the derived address (it's their own BIP32 child), so
+   they can spend the received BTC later. The covenant requires only that
+   payment *lands* there — no maker signature on the Radiant side.
+
+**Closing the nonce-uniqueness gap the review flagged.** The earlier
+"subaddress from (makerPkh, glyphRef, nonce)" framing had a free-floating
+nonce that two same-(maker,REF,amount) offers could collide on. Here the
+distinguishing input is the **BIP32 child index**, which is the offer's
+identity and is *baked into the covenant address* — two offers with the
+same index would be the literally same covenant UTXO (can't coexist
+unspent), and different indices give different addresses. So uniqueness is
+structural, not a hope about nonce entropy. The maker MUST use a fresh
+index per offer; a wallet-side monotonic counter (or derive the index from
+a hash of (REF, amount, timestamp)) suffices, and reuse is self-defeating
+(it just re-funds the same covenant address).
+
+**What the Taker verifies (Phase-3 thin check).** By **funding outpoint**
+(not scripthash): the on-chain covenant at that outpoint commits a specific
+`btcReceiveHash`; the Taker confirms it matches the offer they were given
+and that no *other* live covenant shares it. Because the address is derived
+and committed, "two live offers share a btcReceiveHash" is detectable and,
+on-chain, harmless (they'd be the same covenant address).
+
+**Build impact (Phase 4).**
+- The FT offer factory derives the child BTC key at a fresh index and
+  computes `btcReceiveHash` from it (record the index in the offer so the
+  maker can later sweep the BTC).
+- No covenant *script* change — `btcReceiveHash` is already a committed
+  param; we only change how its value is *chosen* (derived, not a fixed
+  maker address).
+- On-chain proof (finalize leg): fund two FT covenants with different
+  derived `btcReceiveHash`, build one SPV proof of payment to A's address,
+  show A's `finalize` accepts and B's `finalize` **rejects** the same
+  proof. This is the H1 blocker test, run at the Phase-4 on-chain gate.

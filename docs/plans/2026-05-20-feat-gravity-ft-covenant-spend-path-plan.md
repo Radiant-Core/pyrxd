@@ -606,15 +606,18 @@ the Python validator, fund directly, confirm the *covenant* rejects):
 - [ ] `TestMakerCannotCancelLiveOffer` (C1 regression — no Maker-only
   pre-deadline spend path).
 - [ ] `TestSPVProofReuseAcrossOffers` (H1 regression). **Mitigation
-  corrected (security review):** the binding must be **on-chain**
-  (per-offer-unique `btcReceiveHash`, e.g. subaddress derived from
-  `(makerPkh, glyphRef, offer_nonce)` with the nonce a real covenant
-  input, OR an offer-id commitment in the BTC tx). The design doc's
-  off-chain duplicate-address check is **insufficient** for a
-  settle-by-anyone protocol — two same-address covenants both accept the
-  same proof. Resolve the design-doc contradiction (it dropped
-  subaddress derivation; this restores an on-chain binding and closes
-  the nonce-uniqueness gap by binding the nonce into the covenant).
+  DESIGNED (2026-05-20, see design-doc "H1 SPV-proof-reuse binding"):**
+  derive `btcReceiveHash` per-offer from a BIP32 child of the maker's BTC
+  key (pyrxd `hd.bip32` / BRC-42 `derive_child` — no new crypto, **no
+  covenant script change**). Because `btcReceiveHash` is a *committed*
+  code-script param, a distinct derived address ⇒ a distinct **covenant
+  address**, so offer B's `finalize` rejects a proof of payment to offer
+  A's address *by construction*. Uniqueness is **structural** (same
+  derivation index = the same covenant UTXO, can't coexist) — this closes
+  the nonce-entropy gap the review flagged without a free-floating nonce.
+  Blocker test: fund two FT covenants with different derived
+  `btcReceiveHash`, one SPV proof of payment to A → A.finalize accepts,
+  B.finalize **rejects**.
 - [ ] `TestForfeitFeeStarvation` (H4 — forfeit must fund fee from a
   separate input, compatible with `outputs.length == 1`),
   `TestSettlementReorgAcrossDeadline` (document: mitigated by
