@@ -1626,9 +1626,6 @@ class TestSpvOutputOffsetForgery:
         assert 42 not in offs
 
     def test_offset_into_scriptsig_is_rejected(self):
-        import pytest
-
-        from pyrxd.security.errors import SpvVerificationError
         from pyrxd.spv.proof import _output_offsets
 
         _params, raw = self._params_and_tx()
