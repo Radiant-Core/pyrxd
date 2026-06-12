@@ -62,3 +62,47 @@ jobs:
         run: poetry run bandit -r src/ -c pyproject.toml
       - name: Type check
         run: poetry run mypy src/pyrxd/security/
+
+  quickstart:
+    # Tier-1 North Star gate: a fresh dev goes from `pip install` to a minted Glyph
+    # token on a local regtest chain. This job builds the regtest image from the
+    # official Radiant-Core release (the same Dockerfile `pyrxd regtest setup` uses)
+    # and runs that exact path + the RXD covenant consensus suites, so the quickstart
+    # and the covenant validation can't silently rot between releases. Kept separate
+    # from `test` so the fast unit gate stays fast (this one builds a docker image).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6
+        with:
+          python-version: "3.12"
+      - name: Build the regtest node image (official Radiant-Core release binary)
+        run: |
+          docker build -f docker/regtest.Dockerfile \
+            --build-arg RADIANT_VERSION=v3.1.1 \
+            -t radiant-core:v3.1.1-amd64 .
+      - name: Install Poetry
+        run: pip install -r ci/poetry-pin.txt --require-hashes
+      - name: Install dependencies
+        run: poetry install --sync --no-interaction
+      - name: North Star — pip→regtest up→mint a Glyph→assert confirmed
+        run: |
+          set -euo pipefail
+          poetry run pyrxd regtest up --fresh
+          poetry run python examples/regtest_quickstart.py | tee /tmp/quickstart.out
+          grep -q "NFT minted on regtest" /tmp/quickstart.out
+          poetry run pyrxd regtest down
+      - name: RXD covenant spend under consensus on the pinned node
+        env:
+          RADIANT_REGTEST: "1"
+        # The covenant spend paths (HTLC + soulbound) validated against the real
+        # node's script interpreter — this is the gate that catches a Radiant-Core
+        # bump breaking covenant validation. The exhaustive nBits/bin2num
+        # differential matrix (test_spv_covenant_differential_regtest.py) is
+        # deliberately NOT run here: it needs pre-ground pure-Python PoW chains
+        # (tests/_regtest_grind_chains.py), the multi-minute cost PR #140 removed
+        # from CI on purpose. Run that matrix locally before a version bump.
+        run: |
+          poetry run pytest -o "addopts=" -m integration \
+            tests/test_htlc_regtest_e2e.py \
+            tests/test_soulbound_covenant_regtest.py
