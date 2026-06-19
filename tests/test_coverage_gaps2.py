@@ -363,7 +363,10 @@ class TestTransactionEstimatedLength:
         pk = PrivateKey(998)
         addr = pk.address()
         locking = _p2pkh_script(addr)
-        src_out = TransactionOutput(locking, 100_000)
+        # Fund well above the realistic fee: the default model now charges the
+        # 10,000 photons/byte min-relay floor (~2.3M photons for this tx), so a
+        # 100k-photon input could not cover it and change would be dropped.
+        src_out = TransactionOutput(locking, 100_000_000)
         src_tx = Transaction(tx_inputs=[], tx_outputs=[src_out])
         tx_in = TransactionInput(
             source_transaction=src_tx,

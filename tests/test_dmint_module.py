@@ -834,6 +834,67 @@ def test_dmint_cbor_payload_lwma_round_trip():
     assert back == _CBOR_LWMA
 
 
+_CBOR_EPOCH = DmintCborPayload(
+    algo=DmintAlgo.SHA256D,
+    num_contracts=1,
+    max_height=1_000,
+    reward=1_000,
+    premine=0,
+    diff=100_000,
+    daa_mode=DaaMode.EPOCH,
+    target_block_time=60,
+    epoch_length=2016,
+    max_adjustment=4,  # multiplier (= 2 ** max_adjustment_log2=2); mirrors Photonic Mint.tsx default
+)
+
+_CBOR_SCHEDULE = DmintCborPayload(
+    algo=DmintAlgo.SHA256D,
+    num_contracts=1,
+    max_height=1_000,
+    reward=1_000,
+    premine=0,
+    diff=10,
+    daa_mode=DaaMode.SCHEDULE,
+    # (height, difficulty); mirrors Photonic Mint.tsx default "0:1000,1000:500,2000:250"
+    schedule=((0, 1_000), (1_000, 500), (2_000, 250)),
+)
+
+
+def test_dmint_cbor_payload_epoch_round_trip():
+    # EPOCH emits epochLength + maxAdjustment (the multiplier), matching Photonic DmintPayload.
+    d = _CBOR_EPOCH.to_cbor_dict()
+    assert d["daa"]["mode"] == 1
+    assert d["daa"]["epochLength"] == 2016
+    assert d["daa"]["maxAdjustment"] == 4
+    assert "halfLife" not in d["daa"] and "windowSize" not in d["daa"]
+    back = DmintCborPayload.from_cbor_dict(d)
+    assert back == _CBOR_EPOCH
+
+
+def test_dmint_cbor_payload_schedule_round_trip():
+    # SCHEDULE emits schedule[{height, difficulty}], matching Photonic DmintPayload.
+    d = _CBOR_SCHEDULE.to_cbor_dict()
+    assert d["daa"]["mode"] == 4
+    assert d["daa"]["schedule"] == [
+        {"height": 0, "difficulty": 1_000},
+        {"height": 1_000, "difficulty": 500},
+        {"height": 2_000, "difficulty": 250},
+    ]
+    back = DmintCborPayload.from_cbor_dict(d)
+    assert back == _CBOR_SCHEDULE
+
+
+def test_dmint_cbor_payload_backward_compatible_omits_new_keys():
+    # Existing FIXED/ASERT/LWMA payloads must NOT gain epoch/schedule/asymptote keys —
+    # the wire bytes for those modes stay byte-identical to pre-change output.
+    for payload in (_CBOR_FIXED, _CBOR_ASERT, _CBOR_LWMA):
+        daa = payload.to_cbor_dict().get("daa", {})
+        assert "epochLength" not in daa
+        assert "maxAdjustment" not in daa
+        assert "schedule" not in daa
+        assert "asymptote" not in daa
+
+
 def test_glyph_metadata_v2_version_field():
     meta = GlyphMetadata(
         protocol=[GlyphProtocol.FT, GlyphProtocol.DMINT],

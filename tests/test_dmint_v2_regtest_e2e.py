@@ -74,6 +74,7 @@ from pyrxd.glyph.dmint import (
     build_dmint_mint_tx,
     build_dmint_v2_mint_preimage,
     build_mint_scriptsig,
+    compute_next_target_asert_v2,
     compute_next_target_linear,
     mine_solution_dispatch,
 )
@@ -464,6 +465,56 @@ class TestRadiantDmintV2OnConsensus:
         assert recreated.height == 1
         assert recreated.last_time == current_time
         assert recreated.target == expected_target
+
+    def test_v2_asert_mint_advances_target_on_chain(self, node):
+        """An ASERT-v2 (fractional DAA) V2 contract mints and the covenant retargets
+        on-chain to exactly what pyrxd's off-chain ``compute_next_target_asert_v2``
+        predicts. Consensus acceptance PROVES the fractional ``_build_asert_daa_v2``
+        bytecode byte-matches the mirror — a mismatch → recreated state differs →
+        Part C's OP_EQUALVERIFY rejects the mint.
+
+        This is the mode the 2026-06-19 redesign fixed: the legacy integer
+        power-of-2 stepper was dead-zoned and could not harden at all when
+        ``half_life >= target_time`` (here 240 >= 60). v2 moves the target on a
+        single off-target block — and radiantd accepting the recreated state is the
+        consensus stamp that the int64 fractional math agrees end-to-end.
+        """
+        last_time = 1_700_000_000
+        half_life = 240
+        # difficulty=8 → target = MAX/8, below the MAX/4 ASERT-v2 cap, so the DAA has
+        # room to move the recreated target (and this mint's PoW is just the 4-zero
+        # floor, fast). A fast block (delta=30 < target_time=60) → negative drift →
+        # the next target LOWERS (hardens) — the direction the legacy stepper could
+        # never reach with half_life >= target_time.
+        contract = _deploy_v2_contract(
+            node,
+            max_height=10,
+            reward=1000,
+            daa_mode=DaaMode.ASERT,
+            difficulty=8,
+            last_time=last_time,
+            target_time=60,
+            half_life=half_life,
+        )
+        orig = contract.state.target
+        current_time = last_time + 30
+        tx, _nonce = _build_signed_v2_mint(node, contract, current_time=current_time, half_life=half_life)
+
+        expected_target = compute_next_target_asert_v2(
+            current_target=orig, last_time=last_time, current_time=current_time, target_time=60, half_life=half_life
+        )
+        assert expected_target < orig, "ASERT-v2 fast block should LOWER the target (harden)"
+
+        res = node.accepts(tx.serialize().hex())
+        assert res["allowed"] is True, f"ASERT-v2 V2 mint rejected by consensus (off-chain DAA != on-chain?): {res}"
+
+        mtxid = node.cli("sendrawtransaction", tx.serialize().hex())
+        assert isinstance(mtxid, str), mtxid
+        node.mine(1)
+        recreated = DmintState.from_script(bytes.fromhex(node.cli("gettxout", mtxid, "0")["scriptPubKey"]["hex"]))
+        assert recreated.height == 1
+        assert recreated.last_time == current_time
+        assert recreated.target == expected_target  # on-chain retarget == off-chain v2 mirror
 
     def test_v2_schedule_mint_sets_target_on_chain(self, node):
         """A SCHEDULE (pre-baked curve) V2 contract mints and the covenant sets the

@@ -166,7 +166,8 @@ class Transaction:
         """
         Computes the fee for the transaction and adjusts the change outputs accordingly.
 
-        :param model_or_fee: Fee model or fee amount. Defaults to `SatoshisPerKilobyte` with value 10 if not provided.
+        :param model_or_fee: Fee model or fee amount. Defaults to ``SatoshisPerKilobyte(TRANSACTION_FEE_RATE)``
+            — 10,000,000 photons/KB, i.e. the 10,000 photons/byte Radiant min-relay floor — if not provided.
         :param change_distribution: Method of change distribution ('equal' or 'random'). Defaults to 'equal'.
         """
 

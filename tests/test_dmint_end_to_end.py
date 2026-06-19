@@ -26,6 +26,7 @@ from pyrxd.glyph.dmint import (
     DmintState,
     build_dmint_contract_script,
     build_dmint_mint_tx,
+    compute_next_target_asert_v2,
 )
 from pyrxd.glyph.types import GlyphMetadata, GlyphRef
 from pyrxd.security.errors import ValidationError
@@ -533,7 +534,7 @@ def _make_contract_utxo(
         height=height,
         daa_mode=daa_mode,
         target_time=60,
-        half_life=3_600,
+        half_life=240,  # canonical ASERT-v2 default; matches build_dmint_mint_tx's default in _mint()
         last_time=1_700_000_000 if height > 0 else 0,
         **daa_kwargs,
     )
@@ -699,11 +700,13 @@ class TestBuildDmintMintTx:
             _mint(_make_contract_utxo(), funding=_funding(value=10_000))  # << fee + reward
 
     def test_asert_daa_updates_target(self):
-        # Redesign: ASERT is mintable. A slow block (delta=2*targetTime over the
-        # half-life worth of excess) eases difficulty → target grows.
+        # ASERT-v2: a slow block (delta ≫ targetTime) gives a positive fractional
+        # drift → difficulty eases → target grows. Mirrors compute_next_target_asert_v2.
         utxo = _make_contract_utxo(height=5, daa_mode=DaaMode.ASERT)
         last_time = utxo.state.last_time
-        result = _mint(utxo, current_time=last_time + 7200)  # excess 7140, drift +1
+        result = _mint(utxo, current_time=last_time + 7200)  # excess 7140 > 0 → target eases up
+        expected = compute_next_target_asert_v2(utxo.state.target, last_time, last_time + 7200, 60, 240)
+        assert result.updated_state.target == expected
         assert result.updated_state.target > utxo.state.target
         assert result.updated_state.last_time == last_time + 7200
 

@@ -80,6 +80,30 @@ EPOCH_MAX_SAFE_TARGET = 1 << 48
 # SCHEDULE DAA: maximum number of (height, target) entries in a baked schedule.
 SCHEDULE_MAX_ENTRIES = 10
 
+# ---------------------------------------------------------------------------
+# ASERT-v2 fractional fixed-point DAA constants
+# ---------------------------------------------------------------------------
+#
+# pyrxd's on-chain "ASERT" through 0.9 was an INTEGER power-of-2 stepper
+# (drift = trunc(excess / halfLife) clamped [-4,+4]; target *= 2^drift). The
+# 2026-06-19 DAA review found three structural defects: a dead zone (|excess| <
+# halfLife → drift truncates to 0 → no move), a one-sided ratchet (raising
+# difficulty needs excess <= targetTime - halfLife < 0, impossible whenever
+# halfLife >= targetTime), and >=2x lurches off a single nLockTime sample.
+# ASERT-v2 replaces it with a FRACTIONAL fixed-point step in the same int64
+# domain the script VM enforces, reusing LWMA's divide-first + MAX/4 cap (so the
+# same difficulty floor of 4 applies). Canonical byte-for-byte reference:
+# Photonic-Wallet packages/lib/src/dmintDaaV2.ts (computeAsertV2Target) and
+# script.ts (buildAsertDaaBytecode). The two formats coexist on-chain: contracts
+# deployed before the upgrade keep the legacy bytecode and must keep mining under
+# the legacy formula, so the miner distinguishes them by codescript signature.
+ASERT_V2_RADIX = 1 << 16  # 65536 — fixed-point scale (drift is carried as drift × 2^16)
+ASERT_V2_DRIFT_CLAMP = ASERT_V2_RADIX >> 2  # 16384 — ±RADIX/4 ⇒ target moves at most ±25%/mint
+ASERT_V2_MAX_TARGET_DIV4 = MAX_SHA256D_TARGET >> 2  # 0x1FFF…F — headroom + difficulty floor 4 (as LWMA)
+# Canonical default ASERT halfLife (seconds) when a deploy omits it: ≈4× the
+# default 60s targetBlockTime. MUST equal Photonic script.ts DEFAULT_ASERT_HALFLIFE.
+DEFAULT_ASERT_HALFLIFE = 240
+
 
 # ---------------------------------------------------------------------------
 # Enums
@@ -145,7 +169,7 @@ class DmintDeployParams:
     algo: DmintAlgo = DmintAlgo.SHA256D
     daa_mode: DaaMode = DaaMode.FIXED
     target_time: int = 60  # seconds between mints (for DAA modes)
-    half_life: int = 3600  # ASERT half-life in seconds
+    half_life: int = DEFAULT_ASERT_HALFLIFE  # ASERT half-life in seconds (canonical default ≈4× target_time)
     height: int = 0  # current mint height (0 at deploy)
     last_time: int = 0  # timestamp of last mint (0 at deploy)
     epoch_length: int = 2016  # EPOCH: retarget every N blocks
@@ -214,7 +238,16 @@ class DmintCborPayload:
     Indexers read this to discover dMint contracts and display mining
     parameters in wallets/explorers without parsing the contract script.
 
-    Field names mirror Photonic Wallet ``DmintPayload`` type in types.ts.
+    Field names mirror Photonic Wallet ``DmintPayload`` type in types.ts. This is
+    the indexer-facing **display** metadata; it carries CBOR-native values, which
+    for two EPOCH/SCHEDULE fields differ from how ``DmintDeployParams`` stores them
+    — convert at the call site:
+
+    * ``max_adjustment`` is the adjustment **multiplier** (2/4/8/16), i.e.
+      ``2 ** DmintDeployParams.max_adjustment_log2``.
+    * ``schedule`` entries are ``(height, difficulty)``, where
+      ``difficulty = target_to_difficulty(target, algo)`` for each deploy
+      ``(height, target)`` pair.
     """
 
     algo: DmintAlgo  # 0=sha256d, 1=blake3, 2=k12
@@ -227,6 +260,10 @@ class DmintCborPayload:
     target_block_time: int = 60  # seconds between mints (ignored for FIXED)
     half_life: int = 0  # ASERT half-life seconds (0 = N/A)
     window_size: int = 0  # LWMA window size (0 = N/A)
+    asymptote: int = 0  # ASERT asymptote (0 = N/A; optional, mirrors Photonic)
+    epoch_length: int = 0  # EPOCH retarget interval in blocks (0 = N/A)
+    max_adjustment: int = 0  # EPOCH max-adjustment MULTIPLIER 2/4/8/16 (0 = N/A; = 2**max_adjustment_log2)
+    schedule: tuple[tuple[int, int], ...] = ()  # SCHEDULE: ascending (height, difficulty) entries
 
     def __post_init__(self) -> None:
         if self.num_contracts < 1:
@@ -239,6 +276,12 @@ class DmintCborPayload:
             raise ValidationError("premine must be >= 0")
         if self.diff < 1:
             raise ValidationError("diff must be >= 1")
+        if self.asymptote < 0:
+            raise ValidationError("asymptote must be >= 0")
+        if self.epoch_length < 0:
+            raise ValidationError("epoch_length must be >= 0")
+        if self.max_adjustment < 0:
+            raise ValidationError("max_adjustment must be >= 0")
 
     def to_cbor_dict(self) -> dict:
         """Encode to the dict that becomes the ``dmint`` CBOR value."""
@@ -257,8 +300,16 @@ class DmintCborPayload:
             }
             if self.half_life:
                 daa["halfLife"] = self.half_life
+            if self.asymptote:
+                daa["asymptote"] = self.asymptote
             if self.window_size:
                 daa["windowSize"] = self.window_size
+            if self.epoch_length:
+                daa["epochLength"] = self.epoch_length
+            if self.max_adjustment:
+                daa["maxAdjustment"] = self.max_adjustment
+            if self.schedule:
+                daa["schedule"] = [{"height": h, "difficulty": diff} for h, diff in self.schedule]
             d["daa"] = daa
         return d
 
@@ -274,12 +325,22 @@ class DmintCborPayload:
             target_block_time = 60
             half_life = 0
             window_size = 0
+            asymptote = 0
+            epoch_length = 0
+            max_adjustment = 0
+            schedule: tuple[tuple[int, int], ...] = ()
             if "daa" in d:
                 daa = d["daa"]
                 daa_mode = DaaMode(int(daa.get("mode", 0)))
                 target_block_time = int(daa.get("targetBlockTime", 60))
                 half_life = int(daa.get("halfLife", 0))
                 window_size = int(daa.get("windowSize", 0))
+                asymptote = int(daa.get("asymptote", 0))
+                epoch_length = int(daa.get("epochLength", 0))
+                max_adjustment = int(daa.get("maxAdjustment", 0))
+                sched_raw = daa.get("schedule")
+                if sched_raw:
+                    schedule = tuple((int(e["height"]), int(e["difficulty"])) for e in sched_raw)
             return cls(
                 algo=algo,
                 num_contracts=int(d.get("numContracts", 1)),
@@ -291,6 +352,10 @@ class DmintCborPayload:
                 target_block_time=target_block_time,
                 half_life=half_life,
                 window_size=window_size,
+                asymptote=asymptote,
+                epoch_length=epoch_length,
+                max_adjustment=max_adjustment,
+                schedule=schedule,
             )
         except KeyError as e:
             raise ValidationError(f"dmint CBOR missing required field: {e}") from e

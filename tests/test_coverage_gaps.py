@@ -355,7 +355,9 @@ class TestTransactionMethods:
 
     def test_fee_random_distribution_raises_not_implemented(self):
         locking = _make_locking()
-        src_out = TransactionOutput(locking_script=locking, satoshis=100_000)
+        # Fund above the realistic 10,000 photons/byte default fee so positive change
+        # remains and the change-distribution branch (which rejects "random") is reached.
+        src_out = TransactionOutput(locking_script=locking, satoshis=100_000_000)
         src_tx = Transaction(tx_inputs=[], tx_outputs=[src_out])
         tx_in = TransactionInput(
             source_transaction=src_tx,

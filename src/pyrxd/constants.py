@@ -8,7 +8,12 @@ NUMBER_BYTE_LENGTH: int = 32
 TRANSACTION_SEQUENCE: int = int(os.getenv("RXD_PY_SDK_TRANSACTION_SEQUENCE") or 0xFFFFFFFF)
 TRANSACTION_VERSION: int = int(os.getenv("RXD_PY_SDK_TRANSACTION_VERSION") or 1)
 TRANSACTION_LOCKTIME: int = int(os.getenv("RXD_PY_SDK_TRANSACTION_LOCKTIME") or 0)
-TRANSACTION_FEE_RATE: int = int(os.getenv("RXD_PY_SDK_TRANSACTION_FEE_RATE") or 5)  # satoshi per kilobyte
+# Photons per kilobyte. 10_000_000/KB == 10_000 photons/byte == Radiant's post-V2
+# min-relay floor (block 410,000). The old default of 5/KB (0.005 photons/byte) was
+# ~2,000,000× under the floor — any tx built via the no-arg Transaction.fee() default
+# was non-relayable. High-level paths (RxdWallet, HdWallet, glyph, CLI) already default
+# to 10_000 photons/byte; this aligns the low-level default with them.
+TRANSACTION_FEE_RATE: int = int(os.getenv("RXD_PY_SDK_TRANSACTION_FEE_RATE") or 10_000_000)  # photons per kilobyte
 BIP32_DERIVATION_PATH = os.getenv("RXD_PY_SDK_BIP32_DERIVATION_PATH") or "m/"
 BIP39_ENTROPY_BIT_LENGTH: int = int(os.getenv("RXD_PY_SDK_BIP39_ENTROPY_BIT_LENGTH") or 128)
 BIP44_DERIVATION_PATH = os.getenv("RXD_PY_SDK_BIP44_DERIVATION_PATH") or "m/44'/512'/0'"

@@ -33,6 +33,7 @@ from __future__ import annotations
 # Resolved on first attribute access via __getattr__ below.
 _LAZY_EXPORTS: dict[str, tuple[str, str]] = {
     # Public — types bucket
+    "DEFAULT_ASERT_HALFLIFE": ("pyrxd.glyph.dmint.types", "DEFAULT_ASERT_HALFLIFE"),
     "DaaMode": ("pyrxd.glyph.dmint.types", "DaaMode"),
     "DmintAlgo": ("pyrxd.glyph.dmint.types", "DmintAlgo"),
     "DmintCborPayload": ("pyrxd.glyph.dmint.types", "DmintCborPayload"),
@@ -127,6 +128,10 @@ _LAZY_EXPORTS: dict[str, tuple[str, str]] = {
     "compute_next_target_asert": (
         "pyrxd.glyph.dmint.miner",
         "compute_next_target_asert",
+    ),
+    "compute_next_target_asert_v2": (
+        "pyrxd.glyph.dmint.miner",
+        "compute_next_target_asert_v2",
     ),
     "compute_next_target_linear": (
         "pyrxd.glyph.dmint.miner",

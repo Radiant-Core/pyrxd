@@ -1112,7 +1112,9 @@ def _parse_schedule(schedule_json: str) -> tuple[tuple[int, int], ...]:
     help="Initial PoW difficulty (1 = easiest; EPOCH needs >= 32768).",
 )
 @click.option("--target-time", type=int, default=60, show_default=True, help="V2 DAA: target seconds between mints.")
-@click.option("--half-life", type=int, default=3600, show_default=True, help="V2 ASERT: half-life in seconds.")
+@click.option(
+    "--half-life", type=int, default=240, show_default=True, help="V2 ASERT: half-life in seconds (≈4× target time)."
+)
 @click.option("--epoch-length", type=int, default=2016, show_default=True, help="V2 EPOCH: retarget every N blocks.")
 @click.option(
     "--max-adjustment",
@@ -1570,7 +1572,7 @@ def _mine_claim_v2(
     "--schedule", default=None, help="V2 SCHEDULE claim: the contract's schedule as JSON [[height, difficulty], ...]."
 )
 @click.option(
-    "--half-life", type=int, default=3600, show_default=True, help="V2 ASERT claim: the contract's half-life (s)."
+    "--half-life", type=int, default=240, show_default=True, help="V2 ASERT claim: the contract's half-life (s)."
 )
 @click.option("--passphrase/--no-passphrase", default=False)
 @click.pass_obj

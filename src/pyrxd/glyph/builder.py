@@ -868,7 +868,7 @@ class GlyphBuilder:
 # dMint deploy API dataclasses
 # ---------------------------------------------------------------------------
 
-from .dmint import DaaMode, DmintAlgo  # noqa: E402 (after class def — no circular dep)
+from .dmint import DEFAULT_ASERT_HALFLIFE, DaaMode, DmintAlgo  # noqa: E402 (after class def — no circular dep)
 
 
 @dataclass(frozen=True)
@@ -991,7 +991,7 @@ class DmintV2DeployParams:
     algo: DmintAlgo = DmintAlgo.SHA256D
     daa_mode: DaaMode = DaaMode.FIXED
     target_time: int = 60
-    half_life: int = 3600
+    half_life: int = DEFAULT_ASERT_HALFLIFE  # canonical ASERT-v2 default (240); ≈4× target_time
     epoch_length: int = 2016  # EPOCH: retarget every N blocks
     max_adjustment_log2: int = 2  # EPOCH: max 2^N adjustment per epoch (1..4)
     schedule: tuple[tuple[int, int], ...] = ()  # SCHEDULE: ascending (height, target) entries

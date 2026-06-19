@@ -16,11 +16,20 @@ from __future__ import annotations
 
 import random
 
-from pyrxd.glyph.dmint.builders import _build_epoch_daa, _build_linear_daa, _push_minimal
+from pyrxd.glyph.dmint.builders import (
+    _build_asert_daa_legacy,
+    _build_asert_daa_v2,
+    _build_epoch_daa,
+    _build_linear_daa,
+    _push_minimal,
+)
 from pyrxd.glyph.dmint.miner import (
+    compute_next_target_asert,
+    compute_next_target_asert_v2,
     compute_next_target_epoch,
     compute_next_target_linear,
 )
+from pyrxd.glyph.dmint.types import ASERT_V2_MAX_TARGET_DIV4
 
 INT64_MAX = (1 << 63) - 1
 INT64_MIN = -(1 << 63)
@@ -110,10 +119,14 @@ def _run(code: bytes, stack: list, locktime: int) -> list:
             stack.pop()
         elif op == 0x7C:  # OP_SWAP
             stack[-1], stack[-2] = stack[-2], stack[-1]
+        elif op == 0x7B:  # OP_ROT — (x1 x2 x3 → x2 x3 x1)
+            stack[-3], stack[-2], stack[-1] = stack[-2], stack[-1], stack[-3]
         elif op == 0x79:  # OP_PICK
             stack.append(stack[-1 - _num(stack.pop())])
         elif op == 0xC5:  # OP_TXLOCKTIME
             _push(locktime)
+        elif op == 0x8C:  # OP_1SUB
+            _push(_num(stack.pop()) - 1)
         elif op == 0x8D:  # OP_2MUL
             v = _num(stack.pop()) * 2
             if v > INT64_MAX or v < INT64_MIN:
@@ -177,6 +190,18 @@ def _lwma_onchain(target, last_time, current_time, target_time) -> int:
     return _num(stack[-1])
 
 
+def _asert_v2_onchain(target, last_time, current_time, target_time, half_life) -> int:
+    stack = [_cs_encode(v) for v in (0, 0, 0, 0, 0, 0, 2, target_time, last_time, target)]
+    _run(_build_asert_daa_v2(half_life), stack, current_time)
+    return _num(stack[-1])
+
+
+def _asert_legacy_onchain(target, last_time, current_time, target_time, half_life) -> int:
+    stack = [_cs_encode(v) for v in (0, 0, 0, 0, 0, 0, 2, target_time, last_time, target)]
+    _run(_build_asert_daa_legacy(half_life), stack, current_time)
+    return _num(stack[-1])
+
+
 _TARGETS = [
     1,
     2,
@@ -192,6 +217,7 @@ _TARGETS = [
     INT64_MAX // 100000,
 ]
 _TTS = [1, 2, 30, 60, 600, 2048, 86400]
+_HALFLIVES = [1, 2, 30, 60, 240, 600, 3600, 65536]
 _DELTAS = [-1_000_000, -300, -1, 0, 1, 15, 30, 60, 240, 3600, 1 << 30, 1 << 40]
 _LAST = 1_700_000_000
 
@@ -227,6 +253,39 @@ def test_lwma_offchain_matches_onchain() -> None:
         off = compute_next_target_linear(tgt, _LAST, ct, tt)
         on = _lwma_onchain(tgt, _LAST, ct, tt)  # must not raise (no overflow)
         assert on == off, f"LWMA divergence tgt={tgt} tt={tt} delta={ct - _LAST}: on={on} off={off}"
+        assert on >= 1
+
+
+def test_asert_v2_offchain_matches_onchain() -> None:
+    """ASERT-v2 fractional DAA: the off-chain mirror must equal the on-chain
+    bytecode under int64 semantics, with NO overflow abort (the dmintDaaV2.ts
+    proof guarantees every intermediate stays in int64), across half_life values
+    that span the legacy formula's dead-zone / one-sided regime."""
+    rnd = random.Random(20260620)
+    for _ in range(3000):
+        tgt = rnd.choice([*_TARGETS, rnd.randint(1, 1 << 53)])
+        tt = rnd.choice(_TTS)
+        hl = rnd.choice(_HALFLIVES)
+        ct = _LAST + rnd.choice(_DELTAS)
+        off = compute_next_target_asert_v2(tgt, _LAST, ct, tt, hl)
+        on = _asert_v2_onchain(tgt, _LAST, ct, tt, hl)  # must not raise (no int64 overflow)
+        assert on == off, f"ASERT-v2 divergence tgt={tgt} tt={tt} hl={hl} delta={ct - _LAST}: on={on} off={off}"
+        assert 1 <= on <= ASERT_V2_MAX_TARGET_DIV4
+
+
+def test_asert_legacy_offchain_matches_onchain() -> None:
+    """No-brick guard: the legacy off-chain mirror must still match the legacy
+    bytecode, so a contract deployed before the ASERT-v2 upgrade re-mines correctly
+    (the miner dispatches to this pair by codescript signature)."""
+    rnd = random.Random(20260621)
+    for _ in range(3000):
+        tgt = rnd.choice([*_TARGETS, rnd.randint(1, 1 << 53)])
+        tt = rnd.choice(_TTS)
+        hl = rnd.choice(_HALFLIVES)
+        ct = _LAST + rnd.choice(_DELTAS)
+        off = compute_next_target_asert(tgt, _LAST, ct, tt, hl)
+        on = _asert_legacy_onchain(tgt, _LAST, ct, tt, hl)  # must not raise
+        assert on == off, f"legacy ASERT divergence tgt={tgt} tt={tt} hl={hl} delta={ct - _LAST}: on={on} off={off}"
         assert on >= 1
 
 

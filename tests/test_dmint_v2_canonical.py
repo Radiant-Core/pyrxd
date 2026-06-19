@@ -10,6 +10,12 @@ reproduce them byte-for-byte — that equality is the whole point of the redesig
 If a vector here fails, pyrxd's V2 covenant has diverged from canonical Photonic.
 Regenerate the vectors from the upstream source before "fixing" the test.
 
+The ASERT vectors use the **ASERT-v2** fractional bytecode (canonical since
+2026-06-19; ``buildAsertDaaBytecode`` now emits the fractional formula). The
+pre-v2 integer power-of-2 stepper is retained only for re-mining contracts
+deployed before the upgrade — its bytecode is locked by
+``test_legacy_asert_bytecode_is_frozen`` below.
+
 Contract refs in every vector: contractRef = aa*36, tokenRef = bb*36.
 SHA256d only (the covenant compares 64-bit targets; difficulty d → target
 MAX_SHA256D_TARGET // d). blake3/k12 differ only in the powHashOp + algoId byte.
@@ -83,19 +89,15 @@ _GOLDEN: dict[str, tuple[dict, str]] = {
         "00d8aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         "d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb01"
         "6402e8030052013c040000000008cccccccccccccc0cbdc0c859797ea85d795d797ea87e5e7a"
-        "7eaabc01147f77587f040000000088817600a26951797ca269c552799453799402100e967654"
-        "a06375546876548f9f6375548f687600a0637600a0638c7c7608ffffffffffffff3fa0637508"
-        "ffffffffffffff7f678d687c687600a0638c7c7608ffffffffffffff3fa0637508ffffffffff"
-        "ffff7f678d687c687600a0638c7c7608ffffffffffffff3fa0637508ffffffffffffff7f678d"
-        "687c687600a0638c7c7608ffffffffffffff3fa0637508ffffffffffffff7f678d687c687567"
-        "76009f638f7600a0638c7c8e7c687600a0638c7c8e7c687600a0638c7c8e7c687600a0638c7c"
-        "8e7c68756775686876519f637551686b75757575577ae500a069567ae600a06901d053797e0c"
-        "dec0e9aa76e378e4a269e69d7eaa76e47b9d547a818b76537a9c537ade789181547ae6939d63"
-        "6c755279cd01d853797e016a7e886778de519d7676009c63750100677660a163015093518067"
-        "827c7e68684c53d8aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-        "aaaaaaaaaaaad0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
-        "bbbbbbbbbb016402e8030052013c7ec55480547c7e7e6c76009c63750100677660a163015093"
-        "518067827c7e68687e5379ec78885379eac0e9885379cc519d75686d7551",
+        "7eaabc01147f77587f040000000088817600a26951797ca269c5527994537994030000019502"
+        "100e96020040a30200c0a47c08ffffffffffffff1fa37603000001967b959308ffffffffffff"
+        "ff1fa376519f637551686b75757575577ae500a069567ae600a06901d053797e0cdec0e9aa76"
+        "e378e4a269e69d7eaa76e47b9d547a818b76537a9c537ade789181547ae6939d636c755279cd"
+        "01d853797e016a7e886778de519d7676009c63750100677660a163015093518067827c7e6868"
+        "4c53d8aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aad0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        "016402e8030052013c7ec55480547c7e7e6c76009c63750100677660a163015093518067827c"
+        "7e68687e5379ec78885379eac0e9885379cc519d75686d7551",
     ),
     "asert_hl600": (
         dict(
@@ -104,19 +106,15 @@ _GOLDEN: dict[str, tuple[dict, str]] = {
         "55d8aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         "d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb01"
         "6402e80300520178040000000008ffffffffffffff1fbdc0c859797ea85d795d797ea87e5e7a"
-        "7eaabc01147f77587f040000000088817600a26951797ca269c5527994537994025802967654"
-        "a06375546876548f9f6375548f687600a0637600a0638c7c7608ffffffffffffff3fa0637508"
-        "ffffffffffffff7f678d687c687600a0638c7c7608ffffffffffffff3fa0637508ffffffffff"
-        "ffff7f678d687c687600a0638c7c7608ffffffffffffff3fa0637508ffffffffffffff7f678d"
-        "687c687600a0638c7c7608ffffffffffffff3fa0637508ffffffffffffff7f678d687c687567"
-        "76009f638f7600a0638c7c8e7c687600a0638c7c8e7c687600a0638c7c8e7c687600a0638c7c"
-        "8e7c68756775686876519f637551686b75757575577ae500a069567ae600a06901d053797e0c"
-        "dec0e9aa76e378e4a269e69d7eaa76e47b9d547a818b76537a9c537ade789181547ae6939d63"
-        "6c755279cd01d853797e016a7e886778de519d7676009c63750100677660a163015093518067"
-        "827c7e68684c53d8aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-        "aaaaaaaaaaaad0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
-        "bbbbbbbbbb016402e803005201787ec55480547c7e7e6c76009c63750100677660a163015093"
-        "518067827c7e68687e5379ec78885379eac0e9885379cc519d75686d7551",
+        "7eaabc01147f77587f040000000088817600a26951797ca269c5527994537994030000019502"
+        "580296020040a30200c0a47c08ffffffffffffff1fa37603000001967b959308ffffffffffff"
+        "ff1fa376519f637551686b75757575577ae500a069567ae600a06901d053797e0cdec0e9aa76"
+        "e378e4a269e69d7eaa76e47b9d547a818b76537a9c537ade789181547ae6939d636c755279cd"
+        "01d853797e016a7e886778de519d7676009c63750100677660a163015093518067827c7e6868"
+        "4c53d8aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aad0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        "016402e803005201787ec55480547c7e7e6c76009c63750100677660a163015093518067827c"
+        "7e68687e5379ec78885379eac0e9885379cc519d75686d7551",
     ),
     "lwma_h0": (
         dict(height=0, max_height=100, reward=1000, difficulty=4, daa_mode=DaaMode.LWMA, target_time=60),
@@ -180,3 +178,56 @@ def test_part_b4_preserves_newtarget():
     from pyrxd.glyph.dmint.types import _PART_B4
 
     assert _PART_B4.hex() == "6b75757575"
+
+
+# The pre-2026-06-19 legacy integer power-of-2 ASERT DAA bytecode (half_life=3600).
+# Frozen here because the miner rebuilds it to byte-verify — and keep mining — any
+# ASERT contract deployed before the v2 upgrade. If this ever changes, the no-brick
+# path silently breaks. (Generated from the legacy builder, pre-upgrade bytes.)
+_LEGACY_ASERT_DAA_3600 = (
+    "c552799453799402100e967654a06375546876548f9f6375548f687600a0637600a0638c7c76"
+    "08ffffffffffffff3fa0637508ffffffffffffff7f678d687c687600a0638c7c7608ffffffff"
+    "ffffff3fa0637508ffffffffffffff7f678d687c687600a0638c7c7608ffffffffffffff3fa0"
+    "637508ffffffffffffff7f678d687c687600a0638c7c7608ffffffffffffff3fa0637508ffff"
+    "ffffffffff7f678d687c68756776009f638f7600a0638c7c8e7c687600a0638c7c8e7c687600"
+    "a0638c7c8e7c687600a0638c7c8e7c68756775686876519f63755168"
+)
+
+
+def test_legacy_asert_bytecode_is_frozen():
+    # No-brick guard: the legacy builder must keep producing the exact pre-upgrade
+    # bytecode so contracts deployed before ASERT-v2 still re-mine correctly.
+    from pyrxd.glyph.dmint.builders import _build_asert_daa_legacy
+
+    assert _build_asert_daa_legacy(3600).hex() == _LEGACY_ASERT_DAA_3600
+
+
+def test_asert_version_detection_v2_vs_legacy():
+    # The miner dispatches on this: a v2 deploy must read as v2, a legacy contract
+    # (legacy Part B grafted into the same code) must read as legacy (1).
+    from pyrxd.glyph.dmint.builders import (
+        _asert_version_of_code,
+        _build_part_b,
+        build_dmint_code_script,
+    )
+
+    params = DmintDeployParams(
+        contract_ref=_CONTRACT_REF,
+        token_ref=_TOKEN_REF,
+        algo=DmintAlgo.SHA256D,
+        height=0,
+        max_height=100,
+        reward=1000,
+        difficulty=10,
+        daa_mode=DaaMode.ASERT,
+        target_time=60,
+        half_life=3600,
+    )
+    v2_code = build_dmint_code_script(params)
+    assert _asert_version_of_code(v2_code) == 2
+
+    legacy_code = v2_code.replace(
+        _build_part_b(DaaMode.ASERT, 3600, asert_version=2),
+        _build_part_b(DaaMode.ASERT, 3600, asert_version=1),
+    )
+    assert _asert_version_of_code(legacy_code) == 1

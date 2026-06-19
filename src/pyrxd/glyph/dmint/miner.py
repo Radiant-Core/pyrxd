@@ -39,6 +39,7 @@ from pyrxd.security.errors import (
 
 from .builders import (
     _PART_A,
+    _asert_version_of_code,
     _build_part_b,
     _push_4bytes_le,
     _push_minimal,
@@ -53,6 +54,10 @@ from .chain import (
 )
 from .types import (
     _OP_STATESEPARATOR,
+    ASERT_V2_DRIFT_CLAMP,
+    ASERT_V2_MAX_TARGET_DIV4,
+    ASERT_V2_RADIX,
+    DEFAULT_ASERT_HALFLIFE,
     EPOCH_MAX_SAFE_TARGET,
     MAX_SHA256D_TARGET,
     MAX_V2_TARGET_256,
@@ -214,11 +219,19 @@ def compute_next_target_asert(
     target_time: int,
     half_life: int,
 ) -> int:
-    """Compute next ASERT-lite target (mirrors the redesigned on-chain bytecode).
+    """Compute next ASERT target under the LEGACY integer power-of-2 formula.
 
-    The redesign replaced OP_LSHIFT/OP_RSHIFT (which Radiant evaluates as a
-    big-endian bit-string shift — wrong on the LE target encoding) with an
-    unrolled 4-step OP_2MUL/OP_2DIV loop with a per-step overflow cap::
+    Retained ONLY to keep contracts deployed before the 2026-06-19 ASERT-v2
+    upgrade mining under the exact bytecode baked into their codescript (the mint
+    builder detects them via :func:`_asert_version_of_code` and dispatches here).
+    **New deploys use** :func:`compute_next_target_asert_v2` — this stepper is the
+    structurally-broken DAA the v2 redesign replaced (dead zone, one-sided ratchet
+    when half_life ≥ target_time, ≥2× lurches).
+
+    Mirrors the legacy on-chain bytecode, which replaced OP_LSHIFT/OP_RSHIFT (which
+    Radiant evaluates as a big-endian bit-string shift — wrong on the LE target
+    encoding) with an unrolled 4-step OP_2MUL/OP_2DIV loop with a per-step overflow
+    cap::
 
         drift = trunc((current_time - last_time - target_time) / half_life)  # clamp [-4,+4]
         drift > 0:  repeat |drift|x:  target = MAX_TARGET if target > MAX/2 else target*2
@@ -243,6 +256,55 @@ def compute_next_target_asert(
         for _ in range(-drift):
             new_target //= 2
 
+    return max(1, new_target)
+
+
+def compute_next_target_asert_v2(
+    current_target: int,
+    last_time: int,
+    current_time: int,
+    target_time: int,
+    half_life: int,
+) -> int:
+    """Compute the next ASERT-v2 target (mirrors the on-chain ``_build_asert_daa_v2``).
+
+    Fractional fixed-point, symmetric, damped — the formula that replaced the
+    legacy integer power-of-2 stepper (:func:`compute_next_target_asert`) on
+    2026-06-19. Byte-for-byte equivalent to canonical Photonic
+    ``dmintDaaV2.ts`` ``computeAsertV2Target``::
+
+        excess    = (current_time - last_time) - target_time
+        driftFp   = trunc((excess * RADIX) / half_life)        # RADIX = 2^16
+        driftFp   = clamp(driftFp, -RADIX/4, +RADIX/4)         # ≤ ±25%/mint
+        t         = min(current_target, MAX_TARGET/4)          # difficulty floor 4
+        new       = clamp(t + (t // RADIX) * driftFp, 1, MAX_TARGET/4)
+
+    Properties (vs the legacy stepper): no dead zone (driftFp is non-zero for any
+    ``|excess| >= half_life / RADIX`` seconds), symmetric (difficulty rises on fast
+    blocks and falls on slow ones regardless of half_life vs target_time), and
+    damped (each mint moves the target ≤ ±25%, so it converges instead of
+    oscillating). Divide-first keeps every intermediate inside int64, matching the
+    on-chain ``OP_MUL``'s range-abort semantics (proof in ``dmintDaaV2.ts``).
+
+    ``_trunc_div`` (truncate toward zero) is load-bearing: the on-chain ``OP_DIV``
+    truncates toward zero while Python ``//`` floors, and they differ for the
+    negative ``excess`` of an early block — a floor here would diverge the recreated
+    target from what the covenant recomputes and the mint would be rejected.
+
+    .. note::
+       V2-only DAA. V1 has no DAA (fixed difficulty).
+    """
+    if half_life < 1:
+        # Deploy validation forbids this; guard so the mirror never divides by zero
+        # (the bytecode bakes a >= 1 constant, so this branch is unreachable on-chain).
+        half_life = 1
+    excess = (current_time - last_time) - target_time
+    drift_fp = _trunc_div(excess * ASERT_V2_RADIX, half_life)
+    drift_fp = max(-ASERT_V2_DRIFT_CLAMP, min(ASERT_V2_DRIFT_CLAMP, drift_fp))
+    t = min(current_target, ASERT_V2_MAX_TARGET_DIV4)
+    # divide-first (t >= 0 → // == trunc) so the multiply can never overflow int64.
+    delta = (t // ASERT_V2_RADIX) * drift_fp
+    new_target = min(t + delta, ASERT_V2_MAX_TARGET_DIV4)
     return max(1, new_target)
 
 
@@ -871,7 +933,7 @@ def build_dmint_mint_tx(
     *,
     funding_utxo: DmintMinerFundingUtxo | None = None,
     op_return_msg: bytes | None = None,
-    half_life: int = 3600,
+    half_life: int = DEFAULT_ASERT_HALFLIFE,
     epoch_length: int | None = None,
     max_adjustment_log2: int | None = None,
     schedule: tuple[tuple[int, int], ...] | None = None,
@@ -1074,8 +1136,15 @@ def build_dmint_mint_tx(
     # 04 NUM2BIN(locktime) || MINIMAL_PUSH(target) and OP_EQUALVERIFYs it, so the
     # off-chain reconstruction must byte-match.
     new_height = state.height + 1
+    # ASERT comes in two on-chain formats. New deploys bake the fractional v2
+    # bytecode; contracts deployed before the 2026-06-19 upgrade bake the legacy
+    # power-of-2 stepper and MUST keep mining under that formula. Detect which from
+    # the contract's own codescript so the recreated target byte-matches the
+    # covenant's recomputation (a wrong formula → rejected mint after a PoW grind).
+    asert_version = _asert_version_of_code(contract_utxo.script) if state.daa_mode == DaaMode.ASERT else 2
     if state.daa_mode == DaaMode.ASERT:
-        new_target = compute_next_target_asert(
+        _compute_asert = compute_next_target_asert_v2 if asert_version >= 2 else compute_next_target_asert
+        new_target = _compute_asert(
             current_target=state.target,
             last_time=state.last_time,
             current_time=current_time,
@@ -1154,6 +1223,7 @@ def build_dmint_mint_tx(
             epoch_length=epoch_length if epoch_length is not None else 2016,
             max_adjustment_log2=max_adjustment_log2 if max_adjustment_log2 is not None else 2,
             schedule=schedule if schedule is not None else (),
+            asert_version=asert_version,
         )
         part_b_start = 1 + len(_PART_A) + 1  # 0xbd + Part A + powHashOp
         if code_with_separator[part_b_start : part_b_start + len(expected_part_b)] != expected_part_b:

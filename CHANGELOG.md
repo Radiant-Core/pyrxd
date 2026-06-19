@@ -4,6 +4,57 @@ All notable changes to pyrxd are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project
 follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **dMint ASERT difficulty adjustment rebuilt as fractional fixed-point (ASERT-v2).**
+  The previous on-chain "ASERT" was an integer power-of-2 stepper
+  (`drift = trunc(excess / halfLife)` clamped to `[-4, +4]`, `target *= 2^drift`)
+  with three structural defects: a **dead zone** (no adjustment while
+  `|excess| < halfLife`), a **one-sided ratchet** (it could never *raise*
+  difficulty when `halfLife >= targetTime`), and **≥2× lurches** off a single
+  nLockTime sample. ASERT-v2 replaces it with a fractional, symmetric, damped step
+  (`RADIX = 2^16`; `driftFp = (excess·RADIX)/halfLife` clamped to `±RADIX/4` ⇒ the
+  target moves at most ±25% per mint; difficulty floor 4 via the LWMA-style `MAX/4`
+  cap). New `daa_mode=asert` deploys emit the v2 bytecode, which is **byte-identical
+  to canonical Photonic `buildAsertDaaBytecode`** and overflow-safe in int64 by
+  construction (divide-first). Validated by golden byte-match against upstream and a
+  3 000-case differential that executes the actual bytecode under a faithful
+  `CScriptNum`/`OP_MUL`-abort evaluator; a regtest consensus test (`-m integration`)
+  is included.
+- **No brick for pre-upgrade ASERT contracts.** Contracts deployed before this
+  change keep mining under the legacy formula: the miner detects the on-chain
+  format by codescript signature (`<RADIX push> OP_MUL` vs `<halfLife push> OP_DIV`)
+  and dispatches to the matching off-chain target computation. The legacy bytecode
+  is retained and frozen by test.
+- **Low-level fee default raised to the min-relay floor.** `TRANSACTION_FEE_RATE`
+  (the default for the no-argument `Transaction.fee()`) was `5` photons/KB
+  (0.005 photons/byte) — ~2,000,000× under Radiant's 10,000 photons/byte
+  post-V2 floor, so a transaction built via that default was non-relayable. It is
+  now `10_000_000` photons/KB (= 10,000 photons/byte). All high-level paths
+  (`RxdWallet`, `HdWallet`, glyph builders, CLI) already used 10,000 photons/byte;
+  this aligns the low-level default with them. Override via
+  `RXD_PY_SDK_TRANSACTION_FEE_RATE` is unchanged.
+
+### Changed
+
+- **`DmintCborPayload` now mirrors Photonic `DmintPayload` for all DAA modes.**
+  The token-metadata CBOR gained the optional `daa` sub-keys
+  `asymptote` (ASERT), `epochLength` + `maxAdjustment` (EPOCH), and `schedule`
+  (SCHEDULE, as `[{height, difficulty}]`), so EPOCH/SCHEDULE V2 tokens emit and
+  round-trip complete indexer-display metadata. Backward-compatible: FIXED / ASERT /
+  LWMA payloads are byte-unchanged (the new keys are emitted only when set).
+  `max_adjustment` is the multiplier (2/4/8/16) and `schedule` uses difficulty, both
+  CBOR-native — convert from `DmintDeployParams` at the call site.
+
+- **Default ASERT `half_life` is now 240 seconds** (was 3600), ≈4× the default 60 s
+  `target_time`, matching canonical Photonic `DEFAULT_ASERT_HALFLIFE`. Affects
+  `DmintDeployParams`, `build_dmint_mint_tx`, and the `pyrxd glyph deploy-dmint` /
+  `claim-dmint` CLI defaults. Explicit `half_life` values are unaffected; a contract
+  must be re-mined with the same `half_life` it was deployed with (the mint builder
+  byte-verifies this against the baked bytecode before grinding PoW).
+
 ## [0.9.0] — 2026-06-18
 
 Posture + documentation release. pyrxd's maturity framing is now consistent
@@ -875,5 +926,5 @@ covenant variants in this module are experimental.
 - **No third-party security audit yet.** Use at your own risk in
   production.
 
-[0.3.0]: https://github.com/MudwoodLabs/pyrxd/releases/tag/v0.3.0
-[0.2.0]: https://github.com/MudwoodLabs/pyrxd/releases/tag/v0.2.0
+[0.3.0]: https://github.com/Radiant-Core/pyrxd/releases/tag/v0.3.0
+[0.2.0]: https://github.com/Radiant-Core/pyrxd/releases/tag/v0.2.0

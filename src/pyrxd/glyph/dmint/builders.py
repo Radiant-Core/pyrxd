@@ -20,7 +20,8 @@ edge. The ``_match_v1_epilogue`` function (which also uses them) is in
 Symbols (17 + 4 epilogue constants shared with chain):
     _push_minimal, _push_4bytes_le,
     _PART_A, _POW_HASH_OP,
-    _build_asert_daa, _build_linear_daa, _build_part_b,
+    _build_asert_daa_legacy, _build_asert_daa_v2, _build_linear_daa, _build_part_b,
+    _asert_version_of_code,
     build_dmint_state_script, build_dmint_code_script,
     build_dmint_contract_script,
     _V1_ALGO_BYTE_TO_ENUM, _V1_ENUM_TO_ALGO_BYTE,
@@ -43,6 +44,9 @@ from .types import (
     _PART_B1,
     _PART_B2,
     _PART_B4,
+    ASERT_V2_DRIFT_CLAMP,
+    ASERT_V2_RADIX,
+    DEFAULT_ASERT_HALFLIFE,
     MAX_SHA256D_TARGET,
     DaaMode,
     DmintAlgo,
@@ -199,8 +203,15 @@ _ASERT_2MUL_STEP = (
 _ASERT_2DIV_STEP = bytes.fromhex("7600a0638c7c8e7c68")
 
 
-def _build_asert_daa(half_life: int) -> bytes:
-    """ASERT-lite DAA bytecode (§4.5). half_life embedded as a constant.
+def _build_asert_daa_legacy(half_life: int) -> bytes:
+    """LEGACY integer power-of-2 ASERT DAA bytecode (pre-2026-06-19).
+
+    Retained ONLY so contracts deployed before the ASERT-v2 upgrade keep mining
+    under the exact formula baked into their codescript (the miner detects them by
+    signature and dispatches here). **Do not emit for new deploys** — it is the
+    structurally-broken stepper the v2 redesign replaced (dead zone, one-sided
+    ratchet when halfLife ≥ targetTime, ≥2× lurches; see the 2026-06-19 DAA review
+    and :func:`_build_asert_daa_v2`).
 
     Entry stack: ``[target, lastTime, targetTime, daaMode, ...]``. Computes
     ``drift = (currentTime - lastTime - targetTime) / halfLife`` clamped to
@@ -247,6 +258,93 @@ def _build_asert_daa(half_life: int) -> bytes:
         + bytes.fromhex("7551")  #   DROP, push 1
         + b"\x68"  # ENDIF
     )
+
+
+# v2 discriminator: the fractional builder inserts `<RADIX push> OP_MUL`
+# (0300000195) at offset 7 of the ASERT DAA body, where the legacy builder has
+# `<halfLife push> OP_DIV` (5th byte OP_DIV 0x96, never OP_MUL 0x95).
+_ASERT_V2_SIGNATURE = bytes.fromhex("0300000195")
+
+
+def _build_asert_daa_v2(half_life: int) -> bytes:
+    """ASERT-v2 DAA bytecode — fractional, symmetric, damped.
+
+    Byte-for-byte transcription of canonical Photonic ``buildAsertDaaBytecode``
+    (``Radiant-Core/Photonic-Wallet`` ``packages/lib/src/script.ts``), and the
+    on-chain mirror of
+    :func:`pyrxd.glyph.dmint.miner.compute_next_target_asert_v2` /
+    ``dmintDaaV2.ts`` ``computeAsertV2Target``.
+
+    Entry stack ``[target, lastTime, targetTime, daaMode, ...]`` (target on top)::
+
+        excess    = (currentTime - lastTime) - targetTime
+        driftFp   = (excess * RADIX) / halfLife            # signed, OP_DIV trunc toward 0
+        driftFp   = clamp(driftFp, -RADIX/4, +RADIX/4)     # ±25%/mint damping
+        t         = min(target, MAX_TARGET/4)              # difficulty floor 4 (as LWMA)
+        newTarget = clamp(t + (t / RADIX) * driftFp, 1, MAX_TARGET/4)
+
+    Divide-first so the multiply can never overflow int64 (proof in dmintDaaV2.ts):
+    every intermediate stays within ±(2^63 − 1), so unlike the legacy power-of-2
+    stepper there is no INVALID_NUMBER_RANGE_64_BIT risk — and no dead zone /
+    one-sided / 2× lurch. The entry/exit stack contract is identical to the legacy
+    builder, so Part B2/B4 and Part C are unchanged.
+    """
+    if half_life < 1:
+        # Mirrors the canonical builder's guard; deploy validation also enforces this.
+        raise ValidationError("ASERT: half_life must be an integer >= 1")
+    half_life_push = _push_minimal(half_life)
+    radix_push = _push_minimal(ASERT_V2_RADIX)  # 65536 → 03 00 00 01
+    clamp_push = _push_minimal(ASERT_V2_DRIFT_CLAMP)  # +16384 → 02 00 40
+    neg_clamp_push = _push_minimal(-ASERT_V2_DRIFT_CLAMP)  # -16384 → 02 00 c0
+    return (
+        b"\xc5"  # OP_TXLOCKTIME → currentTime
+        + b"\x52\x79"  # OP_2 PICK lastTime
+        + b"\x94"  # OP_SUB → timeDelta = currentTime - lastTime
+        + b"\x53\x79"  # OP_3 PICK targetTime
+        + b"\x94"  # OP_SUB → excess = timeDelta - targetTime
+        + radix_push  # push RADIX
+        + b"\x95"  # OP_MUL → excess * RADIX
+        + half_life_push  # push halfLife
+        + b"\x96"  # OP_DIV → driftFp (truncates toward zero)
+        + clamp_push  # push +RADIX/4
+        + b"\xa3"  # OP_MIN → min(driftFp, +RADIX/4)
+        + neg_clamp_push  # push -RADIX/4
+        + b"\xa4"  # OP_MAX → driftFp clamped to [-RADIX/4, +RADIX/4]
+        + b"\x7c"  # OP_SWAP → bring target to top
+        + _PUSH_QUARTER_MAX_TARGET  # push MAX_TARGET/4
+        + b"\xa3"  # OP_MIN → t = min(target, MAX/4)
+        + b"\x76"  # OP_DUP t
+        + radix_push  # push RADIX
+        + b"\x96"  # OP_DIV → t / RADIX
+        + b"\x7b"  # OP_ROT → bring driftFp to top: [driftFp, t/RADIX, t, ...]
+        + b"\x95"  # OP_MUL → delta = (t/RADIX) * driftFp
+        + b"\x93"  # OP_ADD → newTarget = t + delta
+        + _PUSH_QUARTER_MAX_TARGET  # push MAX_TARGET/4
+        + b"\xa3"  # OP_MIN → cap newTarget at MAX/4
+        + bytes.fromhex("76519f")  # DUP OP_1 LESSTHAN
+        + b"\x63"  # IF
+        + bytes.fromhex("7551")  #   DROP, push 1
+        + b"\x68"  # ENDIF
+    )
+
+
+def _asert_version_of_code(code: bytes) -> int:
+    """Return 2 if an ASERT contract's code uses the v2 fractional bytecode, else 1.
+
+    Mirrors Glyph-miner ``extractDaaParamsFromCodeScript``: the DAA body begins
+    right after ``_PART_B1 + _PART_B2`` in the code section, after a fixed 7-byte
+    ``excess`` preamble (``c5 5279 94 5379 94``). The v2 builder inserts
+    ``<RADIX push> OP_MUL`` (``0300000195``) there; the legacy builder goes straight
+    to ``<halfLife push> OP_DIV`` (5th byte OP_DIV ``96``, never OP_MUL ``95``).
+    Defaults to v2 if the marker is absent — new deploys are v2, and callers only
+    consult this for ``daa_mode == ASERT`` contracts.
+    """
+    marker = _PART_B1 + _PART_B2
+    i = code.find(marker)
+    if i < 0:
+        return 2
+    daa = i + len(marker)
+    return 2 if code[daa + 7 : daa + 12] == _ASERT_V2_SIGNATURE else 1
 
 
 def _build_linear_daa() -> bytes:
@@ -374,16 +472,25 @@ def _build_schedule_daa(schedule: tuple[tuple[int, int], ...]) -> bytes:
 
 def _build_part_b(
     daa_mode: DaaMode,
-    half_life: int = 3600,
+    half_life: int = DEFAULT_ASERT_HALFLIFE,
     *,
     epoch_length: int = 2016,
     max_adjustment_log2: int = 2,
     schedule: tuple[tuple[int, int], ...] = (),
+    asert_version: int = 2,
 ) -> bytes:
+    """Assemble Part B (PoW extract + target compare + DAA + stack cleanup).
+
+    ``asert_version`` selects the ASERT DAA bytecode: 2 (default) emits the
+    fractional v2 formula for new deploys; 1 emits the legacy power-of-2 stepper
+    and exists ONLY so the mint builder can rebuild — and byte-verify against — the
+    bytecode of an ASERT contract deployed before the v2 upgrade. Ignored for all
+    non-ASERT modes.
+    """
     if daa_mode == DaaMode.FIXED:
         daa_bytes = b""  # fixed difficulty — no DAA bytecode
     elif daa_mode == DaaMode.ASERT:
-        daa_bytes = _build_asert_daa(half_life)
+        daa_bytes = _build_asert_daa_v2(half_life) if asert_version >= 2 else _build_asert_daa_legacy(half_life)
     elif daa_mode == DaaMode.LWMA:
         daa_bytes = _build_linear_daa()
     elif daa_mode == DaaMode.EPOCH:
