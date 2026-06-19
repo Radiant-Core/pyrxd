@@ -4,7 +4,7 @@
 **Status:** Brainstorm (pre-plan)
 **Owner:** eric
 **Builds on:** [`docs/brainstorms/2026-05-07-dmint-integration-brainstorm.md`](2026-05-07-dmint-integration-brainstorm.md) (the M1/M2/M3 split)
-**M1 PR:** [#65](https://github.com/MudwoodLabs/pyrxd/pull/65) (V1 mint shipped; V1 builders, miner, helpers all public)
+**M1 PR:** [#65](https://github.com/Radiant-Core/pyrxd/pull/65) (V1 mint shipped; V1 builders, miner, helpers all public)
 
 ## What We're Building
 

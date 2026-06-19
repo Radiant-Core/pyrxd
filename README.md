@@ -4,7 +4,7 @@ Python SDK for the [Radiant (RXD) blockchain](https://radiantcore.org/).
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
-[![Docs](https://github.com/MudwoodLabs/pyrxd/actions/workflows/docs.yml/badge.svg)](https://mudwoodlabs.github.io/pyrxd/)
+[![Docs](https://github.com/Radiant-Core/pyrxd/actions/workflows/docs.yml/badge.svg)](https://mudwoodlabs.github.io/pyrxd/)
 
 A typed, async-first SDK for building on Radiant — a UTXO chain with Bitcoin-style
 script *plus* induction (recursive covenants) and a native, consensus-enforced token

@@ -124,7 +124,7 @@ separately if real demand surfaces. Deliberately not numbered as
 "M2.5" because that framing would imply scheduled work; this is a
 ticket-stub, not a milestone.
 
-M1 (V1 mint) already ships in [PR #65](https://github.com/MudwoodLabs/pyrxd/pull/65)
+M1 (V1 mint) already ships in [PR #65](https://github.com/Radiant-Core/pyrxd/pull/65)
 with public helpers M2 reuses unchanged: `find_dmint_funding_utxo`,
 `is_token_bearing_script`, `build_dmint_v1_state_script`,
 `build_dmint_v1_code_script`, `build_dmint_v1_contract_script`,

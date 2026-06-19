@@ -48,7 +48,7 @@ BIP143 byte-for-byte (see
 [BIP143](https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki)).
 
 The canonical Python implementation is in
-[`src/pyrxd/transaction/transaction_preimage.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/src/pyrxd/transaction/transaction_preimage.py),
+[`src/pyrxd/transaction/transaction_preimage.py`](https://github.com/Radiant-Core/pyrxd/tree/main/src/pyrxd/transaction/transaction_preimage.py),
 function `_preimage`. The radiantjs reference is
 `GetHashOutputHashes` in `lib/transaction/sighash.js`.
 
@@ -217,7 +217,7 @@ If you signed a trial transaction, mutated its outputs, and signed
 again, the stale signature stays in place and the broadcast fails
 mysteriously. Reset `tx_in.unlocking_script = None` between signings,
 or pass `tx.sign(bypass=False)` — see
-[`tests/test_preimage.py::TestTwoPassSigning`](https://github.com/MudwoodLabs/pyrxd/tree/main/tests/test_preimage.py)
+[`tests/test_preimage.py::TestTwoPassSigning`](https://github.com/Radiant-Core/pyrxd/tree/main/tests/test_preimage.py)
 for the canonical reproduction.
 
 ---
@@ -238,7 +238,7 @@ computation in isolation, pyrxd ships pinned vectors generated from
 radiantjs against the mainnet reveal tx
 `dac1e2dfed64fbfd0f0fe6b925e144cfc32ef76803abc7a6a4058406d707b407` —
 see `TestComputeHashOutputHashes` in
-[`tests/test_preimage.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/tests/test_preimage.py).
+[`tests/test_preimage.py`](https://github.com/Radiant-Core/pyrxd/tree/main/tests/test_preimage.py).
 Reusing those hex constants is the fastest way to verify a port
 without standing up a full transaction.
 
@@ -249,11 +249,11 @@ without standing up a full transaction.
 - **BIP143** (the standard preimage Radiant extends):
   [bitcoin/bips#bip-0143](https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki)
 - **pyrxd implementation**:
-  [`src/pyrxd/transaction/transaction_preimage.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/src/pyrxd/transaction/transaction_preimage.py)
+  [`src/pyrxd/transaction/transaction_preimage.py`](https://github.com/Radiant-Core/pyrxd/tree/main/src/pyrxd/transaction/transaction_preimage.py)
   — `_preimage`, `_compute_hash_output_hashes`, `_get_push_refs`,
   `tx_preimage`.
 - **High-level entry point**:
-  [`Transaction.preimage`](https://github.com/MudwoodLabs/pyrxd/tree/main/src/pyrxd/transaction/transaction.py)
+  [`Transaction.preimage`](https://github.com/Radiant-Core/pyrxd/tree/main/src/pyrxd/transaction/transaction.py)
   and `Transaction.sign`.
 - **radiantjs reference**: `GetHashOutputHashes` in
   `lib/transaction/sighash.js`

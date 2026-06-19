@@ -12,7 +12,7 @@ This tutorial walks the canonical two-transaction flow:
    permanent token reference embedded in that output.
 
 The runnable reference is
-[`examples/ft_deploy_premine.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/examples/ft_deploy_premine.py).
+[`examples/ft_deploy_premine.py`](https://github.com/Radiant-Core/pyrxd/tree/main/examples/ft_deploy_premine.py).
 This page walks the same flow step-by-step. By default everything is a
 dry run — no transaction is broadcast unless you explicitly opt in.
 
@@ -152,7 +152,7 @@ outputs:
 Construction details (P2PKH unlock template, fee model,
 `Transaction.sign()`) match the demo and are not specific to FT —
 see `build_commit_tx` in
-[`examples/ft_deploy_premine.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/examples/ft_deploy_premine.py).
+[`examples/ft_deploy_premine.py`](https://github.com/Radiant-Core/pyrxd/tree/main/examples/ft_deploy_premine.py).
 
 ```{note}
 **DRY_RUN by default.** The reference example sets
@@ -265,7 +265,7 @@ without an indexer.
   75-byte FT shape *and* the right token ref — is explained at length
   in [Radiant FTs are on-chain](../concepts/radiant-fts-are-on-chain.md)
   and demonstrated end-to-end in
-  [`examples/ft_transfer_demo.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/examples/ft_transfer_demo.py).
+  [`examples/ft_transfer_demo.py`](https://github.com/Radiant-Core/pyrxd/tree/main/examples/ft_transfer_demo.py).
 - **Distribute by mining instead of premining.** If you want supply
   emitted by parallel proof-of-work contracts rather than handed to a
   single address up front, that's a *dMint* deploy

@@ -11,7 +11,7 @@ table that points you at the right module.
 ## Development setup
 
 ```bash
-git clone https://github.com/MudwoodLabs/pyrxd.git
+git clone https://github.com/Radiant-Core/pyrxd.git
 cd pyrxd
 python3 -m venv .venv
 source .venv/bin/activate
@@ -178,7 +178,7 @@ the *why* in the body.
 
 ## Reporting bugs
 
-Open an issue at <https://github.com/MudwoodLabs/pyrxd/issues>.
+Open an issue at <https://github.com/Radiant-Core/pyrxd/issues>.
 
 Please include:
 

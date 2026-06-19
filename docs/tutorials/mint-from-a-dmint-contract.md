@@ -184,7 +184,7 @@ small JSON-over-stdio protocol.
 Install [`glyph-miner`](https://github.com/RadiantBlockchain-Community/glyph-miner)
 (or any miner that speaks the same protocol — the wire shape is
 documented in the docstring of
-[`pyrxd.glyph.dmint.mine_solution_external`](https://github.com/MudwoodLabs/pyrxd/blob/main/src/pyrxd/glyph/dmint/__init__.py)).
+[`pyrxd.glyph.dmint.mine_solution_external`](https://github.com/Radiant-Core/pyrxd/blob/main/src/pyrxd/glyph/dmint/__init__.py)).
 
 Then export the variable. The value is the full command line pyrxd
 should spawn, space-separated:
@@ -218,7 +218,7 @@ only reason to configure anything in this step.
 ## Step 3 — Dry-run the mint
 
 Run the canonical end-to-end script,
-[`examples/dmint_claim_demo.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/examples/dmint_claim_demo.py),
+[`examples/dmint_claim_demo.py`](https://github.com/Radiant-Core/pyrxd/tree/main/examples/dmint_claim_demo.py),
 with `DRY_RUN=1` (the default). The script will fetch the contract,
 scan funding, build the unsigned tx, mine a nonce, splice it in, sign
 the funding input, and print the raw transaction hex — but **not**
@@ -362,6 +362,6 @@ mainnet:
 For the protocol-level detail behind any of the above, see the
 [V1 dMint deploys concept page](../concepts/dmint-v1-deploy.md). For
 the runnable reference,
-[`examples/dmint_claim_demo.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/examples/dmint_claim_demo.py)
+[`examples/dmint_claim_demo.py`](https://github.com/Radiant-Core/pyrxd/tree/main/examples/dmint_claim_demo.py)
 is the canonical script — every snippet on this page is a transcription
 of one section of it.

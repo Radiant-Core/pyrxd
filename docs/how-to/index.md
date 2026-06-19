@@ -98,12 +98,12 @@ migrate-0.4-to-0.5
 ## Coming soon
 
 Additional how-to guides are being written. The runnable demos in
-[`examples/`](https://github.com/MudwoodLabs/pyrxd/tree/main/examples) and
+[`examples/`](https://github.com/Radiant-Core/pyrxd/tree/main/examples) and
 the [API Reference](../api/index.rst) cover the same surface in the
 meantime.
 
 Suggested guides on the roadmap (open an
-[issue](https://github.com/MudwoodLabs/pyrxd/issues) to influence priority):
+[issue](https://github.com/Radiant-Core/pyrxd/issues) to influence priority):
 
 - How to build a custom locking script
 - How to run a same-chain partial-transaction swap (`pyrxd.swap`)

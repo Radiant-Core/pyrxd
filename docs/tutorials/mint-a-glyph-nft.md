@@ -11,7 +11,7 @@ explains how to flip to a real wallet.
 
 > **Note on the referenced demo.** The snippets pasted on this page are
 > synthetic-safe and run with no funds. The full reference script
-> [`examples/glyph_mint_demo.py`](https://github.com/MudwoodLabs/pyrxd/blob/main/examples/glyph_mint_demo.py)
+> [`examples/glyph_mint_demo.py`](https://github.com/Radiant-Core/pyrxd/blob/main/examples/glyph_mint_demo.py)
 > is different: it **requires** a funded `GLYPH_WIF` and fetches mainnet
 > UTXOs, and exits early if you run it without them. Read it for the
 > transaction-assembly plumbing, but don't expect it to run key-free.
@@ -150,7 +150,7 @@ print(f"Commit script:       {commit_result.commit_script.hex()}")
 
 You still have to build the actual `Transaction`. The full reference
 implementation is in
-[`examples/glyph_mint_demo.py`](https://github.com/MudwoodLabs/pyrxd/blob/main/examples/glyph_mint_demo.py)
+[`examples/glyph_mint_demo.py`](https://github.com/Radiant-Core/pyrxd/blob/main/examples/glyph_mint_demo.py)
 — look for `build_commit_tx`. It:
 
 1. Spends one or more P2PKH UTXOs from your address.
@@ -240,7 +240,7 @@ print(f"ScriptSig suffix ({len(reveal_scripts.scriptsig_suffix)} bytes): "
 
 The reveal tx itself spends the commit output (`vin[0]`) and produces
 one NFT output. Again, the wiring lives in
-[`examples/glyph_mint_demo.py`](https://github.com/MudwoodLabs/pyrxd/blob/main/examples/glyph_mint_demo.py)
+[`examples/glyph_mint_demo.py`](https://github.com/Radiant-Core/pyrxd/blob/main/examples/glyph_mint_demo.py)
 — `build_reveal_tx` is the relevant helper.
 
 > **`is_nft=True` is load-bearing.** `prepare_reveal` cross-checks
@@ -254,7 +254,7 @@ one NFT output. Again, the wiring lives in
 ## Step 5 — Broadcast (DRY_RUN by default)
 
 Mirror the env-var guard from
-[`examples/glyph_mint_demo.py`](https://github.com/MudwoodLabs/pyrxd/blob/main/examples/glyph_mint_demo.py):
+[`examples/glyph_mint_demo.py`](https://github.com/Radiant-Core/pyrxd/blob/main/examples/glyph_mint_demo.py):
 
 ```python
 import os
@@ -330,7 +330,7 @@ look right.
 ## What to read next
 
 - The full runnable reference:
-  [`examples/glyph_mint_demo.py`](https://github.com/MudwoodLabs/pyrxd/blob/main/examples/glyph_mint_demo.py).
+  [`examples/glyph_mint_demo.py`](https://github.com/Radiant-Core/pyrxd/blob/main/examples/glyph_mint_demo.py).
   This tutorial omits the transaction-assembly plumbing (UTXO
   selection, fee computation, signing with a custom unlocking
   template); the demo shows all of it.

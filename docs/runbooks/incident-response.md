@@ -45,7 +45,7 @@ issue, or PR.
 - Set severity (table above) and the affected version range.
 - Open a **private** GitHub Security Advisory (Security tab →
   "Report a vulnerability" → draft): `gh api
-  repos/MudwoodLabs/pyrxd/security-advisories -f summary=… -f severity=…`.
+  repos/Radiant-Core/pyrxd/security-advisories -f summary=… -f severity=…`.
   The advisory is the private workspace; it can request a CVE and spin a
   private fork for the fix when ready.
 

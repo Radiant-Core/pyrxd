@@ -25,7 +25,7 @@
 - [ ] Confirm ruff + bandit clean: `ruff check src tests examples && bandit -r src/ -c pyproject.toml --quiet`
 - [ ] Build a fresh venv specifically for this session so module state can't bleed between commands
 - [ ] Set `PYRXD_WALLET_PATH=/tmp/redteam-$(date +%s)/wallet.dat` so all wallet ops happen in a throwaway dir
-- [ ] Have `gh issue create` ready (or open https://github.com/MudwoodLabs/pyrxd/issues/new in a browser)
+- [ ] Have `gh issue create` ready (or open https://github.com/Radiant-Core/pyrxd/issues/new in a browser)
 
 ---
 

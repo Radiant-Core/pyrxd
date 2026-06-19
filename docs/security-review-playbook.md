@@ -133,7 +133,7 @@ emitted by a different implementation (Photonic, glyph-miner,
 Photonic Wallet, etc.) on mainnet. A self-loop test pinning your own
 output against your own output is just a slower round-trip test.
 
-[rgg]: https://github.com/MudwoodLabs/radiant-glyph-guide
+[rgg]: https://github.com/Radiant-Core/radiant-glyph-guide
 
 ---
 

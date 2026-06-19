@@ -221,6 +221,6 @@ Some directions from here:
   you're building on pyrxd 0.5.0 and saw that the `mint scriptSig`
   pushes literal `SHA256d` of scripts. That detail is load-bearing.
 - **Install pyrxd** with `pip install pyrxd` and run the demos in
-  [`examples/`](https://github.com/MudwoodLabs/pyrxd/tree/main/examples).
+  [`examples/`](https://github.com/Radiant-Core/pyrxd/tree/main/examples).
   Once you have a funded address you can build, sign, and broadcast
   the same shapes you just inspected.

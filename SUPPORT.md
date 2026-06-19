@@ -2,15 +2,15 @@
 
 ## Where to get help
 
-- **Bugs and feature requests:** [GitHub Issues](https://github.com/MudwoodLabs/pyrxd/issues)
-- **Questions and usage discussion:** [GitHub Discussions](https://github.com/MudwoodLabs/pyrxd/discussions)
+- **Bugs and feature requests:** [GitHub Issues](https://github.com/Radiant-Core/pyrxd/issues)
+- **Questions and usage discussion:** [GitHub Discussions](https://github.com/Radiant-Core/pyrxd/discussions)
 - **Security vulnerabilities:** see [SECURITY.md](SECURITY.md) — do not file public issues
 - **Direct contact:** opensource@mudwoodlabs.com (project direction, partnership, anything that doesn't fit an issue)
 
 ## Before filing an issue
 
 1. Check the [CHANGELOG](CHANGELOG.md) — your bug may already be fixed in a newer release.
-2. Check [open issues](https://github.com/MudwoodLabs/pyrxd/issues) and [closed issues](https://github.com/MudwoodLabs/pyrxd/issues?q=is%3Aissue+is%3Aclosed) for prior reports.
+2. Check [open issues](https://github.com/Radiant-Core/pyrxd/issues) and [closed issues](https://github.com/Radiant-Core/pyrxd/issues?q=is%3Aissue+is%3Aclosed) for prior reports.
 3. Try reproducing on the latest commit on `main`.
 
 ## What makes a good issue

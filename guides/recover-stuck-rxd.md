@@ -100,7 +100,7 @@ After `pipx ensurepath`, **close the terminal and open a new one** so the
 > re-run the Python installer with "Add Python to PATH" ticked.
 
 The official package lives at <https://pypi.org/project/pyrxd/> and the source
-code is public at <https://github.com/MudwoodLabs/pyrxd>. Don't install anything
+code is public at <https://github.com/Radiant-Core/pyrxd>. Don't install anything
 that *claims* to be pyrxd from anywhere else.
 
 ---
@@ -297,5 +297,5 @@ If Step 2 finds nothing even though the explorer shows your balance:
 ---
 
 *This guide and the `pyrxd` tool are open source. Verify the tool at
-<https://github.com/MudwoodLabs/pyrxd> and <https://pypi.org/project/pyrxd/>
+<https://github.com/Radiant-Core/pyrxd> and <https://pypi.org/project/pyrxd/>
 before installing.*

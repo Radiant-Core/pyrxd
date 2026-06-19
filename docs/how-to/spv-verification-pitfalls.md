@@ -221,6 +221,6 @@ pyrxd's SPV layer ([`pyrxd.spv`](../api/spv.rst)) implements these defenses;
 
 - [Verify an SPV proof](verify-an-spv-proof.md) — the calling recipe
 - [`pyrxd.spv` API reference](../api/spv.rst)
-- Source: [`src/pyrxd/spv/`](https://github.com/MudwoodLabs/pyrxd/tree/main/src/pyrxd/spv)
+- Source: [`src/pyrxd/spv/`](https://github.com/Radiant-Core/pyrxd/tree/main/src/pyrxd/spv)
 - [CVE-2012-2459](https://en.bitcoin.it/wiki/CVE-2012-2459) — the Merkle-tree
   duplicate-node vulnerability behind items 4–5

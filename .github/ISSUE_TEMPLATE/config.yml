@@ -2,7 +2,7 @@ blank_issues_enabled: false
 
 contact_links:
   - name: Security vulnerability
-    url: https://github.com/MudwoodLabs/pyrxd/security/advisories/new
+    url: https://github.com/Radiant-Core/pyrxd/security/advisories/new
     about: Please report security issues privately. See SECURITY.md or email security@mudwoodlabs.com.
   - name: Question or general discussion
     url: mailto:opensource@mudwoodlabs.com

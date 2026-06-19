@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Post-public-flip configuration for MudwoodLabs/pyrxd.
+# Post-public-flip configuration for Radiant-Core/pyrxd.
 #
 # Run this AFTER manually flipping the repo from private -> public in
 # the GitHub UI. It enables features that GitHub free-tier only exposes
@@ -16,7 +16,7 @@
 
 set -euo pipefail
 
-REPO="MudwoodLabs/pyrxd"
+REPO="Radiant-Core/pyrxd"
 BRANCH="main"
 
 say() { printf '\n\033[1;36m== %s ==\033[0m\n' "$*"; }
@@ -87,7 +87,7 @@ cat <<'EOF'
 == Manual follow-ups (cannot be done via API) ==
 
 1. Triage the 7 open Dependabot PRs (#1-#7 as of bootstrap):
-     gh pr list -R MudwoodLabs/pyrxd --state open
+     gh pr list -R Radiant-Core/pyrxd --state open
    Bandit/CI must pass before merging. Review each diff.
 
 2. (Optional) Add a CI status badge to README.md once the public CI runs

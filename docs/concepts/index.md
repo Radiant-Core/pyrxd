@@ -102,4 +102,4 @@ material at protocol-implementer depth.
   hygiene, signer separation, threat boundaries
 
 If you have a use case that would make a useful concept article,
-open an [issue](https://github.com/MudwoodLabs/pyrxd/issues).
+open an [issue](https://github.com/Radiant-Core/pyrxd/issues).

@@ -39,7 +39,7 @@ asyncio.run(main("0100000001..."))
 `Txid` on success. If you already have a `Transaction` object, pass
 `tx.serialize()` rather than `tx.hex()` — same bytes, no round-trip
 through hex. For the end-to-end "build + sign + broadcast" pattern see
-[`examples/ft_transfer_demo.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/examples/ft_transfer_demo.py).
+[`examples/ft_transfer_demo.py`](https://github.com/Radiant-Core/pyrxd/tree/main/examples/ft_transfer_demo.py).
 
 The URL must be `wss://` (TLS). Bare `ws://` is rejected at construction
 time unless you pass `allow_insecure=True`; do that only for a local
@@ -143,6 +143,6 @@ visible to any Radiant block explorer once it confirms.
 
 ## References
 
-- [`pyrxd.network.electrumx.ElectrumXClient`](https://github.com/MudwoodLabs/pyrxd/blob/main/src/pyrxd/network/electrumx.py) — the broadcast and polling API
-- [`examples/ft_transfer_demo.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/examples/ft_transfer_demo.py) — full build + sign + broadcast pattern
+- [`pyrxd.network.electrumx.ElectrumXClient`](https://github.com/Radiant-Core/pyrxd/blob/main/src/pyrxd/network/electrumx.py) — the broadcast and polling API
+- [`examples/ft_transfer_demo.py`](https://github.com/Radiant-Core/pyrxd/tree/main/examples/ft_transfer_demo.py) — full build + sign + broadcast pattern
 - [V1 dMint mint scriptSig divergence](../solutions/logic-errors/dmint-v1-mint-scriptsig-divergence.md) — the `mandatory-script-verify-flag-failed` symptom for V1 mints

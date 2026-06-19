@@ -191,7 +191,7 @@ the runnable reference.
 ## End-to-end V1 mint snippet (0.5.0)
 
 The full mint loop, transcribed from
-[`examples/dmint_claim_demo.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/examples/dmint_claim_demo.py):
+[`examples/dmint_claim_demo.py`](https://github.com/Radiant-Core/pyrxd/tree/main/examples/dmint_claim_demo.py):
 
 ```python
 from pyrxd.glyph.dmint import (
@@ -258,9 +258,9 @@ concept page.
 
 ## References
 
-- [CHANGELOG entry for 0.5.0](https://github.com/MudwoodLabs/pyrxd/blob/main/CHANGELOG.md)
+- [CHANGELOG entry for 0.5.0](https://github.com/Radiant-Core/pyrxd/blob/main/CHANGELOG.md)
 - [V1 dMint deploys concept page](../concepts/dmint-v1-deploy.md)
-- [Runnable V1 mint demo: `examples/dmint_claim_demo.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/examples/dmint_claim_demo.py)
-- [Mainnet golden-vector tests: `tests/test_dmint_v1_mint.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/tests/test_dmint_v1_mint.py)
+- [Runnable V1 mint demo: `examples/dmint_claim_demo.py`](https://github.com/Radiant-Core/pyrxd/tree/main/examples/dmint_claim_demo.py)
+- [Mainnet golden-vector tests: `tests/test_dmint_v1_mint.py`](https://github.com/Radiant-Core/pyrxd/tree/main/tests/test_dmint_v1_mint.py)
 - Fix verification txid: `c9fdcd3488f3e396bec3ce0b766bb8070963e7e75bb513b8820b6663e469e530`
 - Photonic reference txid: `146a4d688ba3fc1ea9588e406cc6104be2c9321738ea093d6db8e1b83581af3c`

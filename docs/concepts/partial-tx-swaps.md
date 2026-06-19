@@ -94,7 +94,7 @@ Radiant FTs carry their amount as the output's photon value (1 photon =
 
 ## Minimal example
 
-See [`examples/partial_swap_demo.py`](https://github.com/MudwoodLabs/pyrxd/blob/main/examples/partial_swap_demo.py)
+See [`examples/partial_swap_demo.py`](https://github.com/Radiant-Core/pyrxd/blob/main/examples/partial_swap_demo.py)
 for a runnable end-to-end demo (offer → transport → accept → verify),
 covering an FT-for-RXD trade with conservation and change.
 

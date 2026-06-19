@@ -21,8 +21,8 @@ Install with ``pip install pyrxd``.
    :maxdepth: 1
    :caption: Project
 
-   Source on GitHub <https://github.com/MudwoodLabs/pyrxd>
-   Issue tracker <https://github.com/MudwoodLabs/pyrxd/issues>
+   Source on GitHub <https://github.com/Radiant-Core/pyrxd>
+   Issue tracker <https://github.com/Radiant-Core/pyrxd/issues>
    PyPI <https://pypi.org/project/pyrxd/>
 
 

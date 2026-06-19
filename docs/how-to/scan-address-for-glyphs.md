@@ -154,7 +154,7 @@ bytes. A 75-byte script ending with the canonical FT-CSH fingerprint is
 reported as an FT; a 63-byte script matching the NFT singleton shape is
 reported as an NFT. (A dedicated concept page on the inspect tool is in
 flight; until it lands, the implementation in
-[`src/pyrxd/glyph/inspector.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/src/pyrxd/glyph/inspector.py)
+[`src/pyrxd/glyph/inspector.py`](https://github.com/Radiant-Core/pyrxd/tree/main/src/pyrxd/glyph/inspector.py)
 is the canonical reference.)
 
 That tells you two things — and nothing more:
@@ -182,16 +182,16 @@ semantic correctness.
 ## References
 
 - Scanner source:
-  [`src/pyrxd/glyph/scanner.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/src/pyrxd/glyph/scanner.py)
+  [`src/pyrxd/glyph/scanner.py`](https://github.com/Radiant-Core/pyrxd/tree/main/src/pyrxd/glyph/scanner.py)
 - Classifier (used internally by the scanner):
-  [`src/pyrxd/glyph/inspector.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/src/pyrxd/glyph/inspector.py)
+  [`src/pyrxd/glyph/inspector.py`](https://github.com/Radiant-Core/pyrxd/tree/main/src/pyrxd/glyph/inspector.py)
 - ElectrumX client:
-  [`src/pyrxd/network/electrumx.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/src/pyrxd/network/electrumx.py)
+  [`src/pyrxd/network/electrumx.py`](https://github.com/Radiant-Core/pyrxd/tree/main/src/pyrxd/network/electrumx.py)
 - Result types:
-  [`src/pyrxd/glyph/types.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/src/pyrxd/glyph/types.py)
+  [`src/pyrxd/glyph/types.py`](https://github.com/Radiant-Core/pyrxd/tree/main/src/pyrxd/glyph/types.py)
 - Scanner tests (canonical usage):
-  [`tests/test_glyph_scanner.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/tests/test_glyph_scanner.py)
+  [`tests/test_glyph_scanner.py`](https://github.com/Radiant-Core/pyrxd/tree/main/tests/test_glyph_scanner.py)
 - Conceptual background: [Radiant FTs are on-chain](../concepts/radiant-fts-are-on-chain.md)
 - Same classifier from the CLI: the `pyrxd glyph inspect` tool (a
   dedicated concept page is in flight; meanwhile see
-  [`src/pyrxd/glyph/inspector.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/src/pyrxd/glyph/inspector.py))
+  [`src/pyrxd/glyph/inspector.py`](https://github.com/Radiant-Core/pyrxd/tree/main/src/pyrxd/glyph/inspector.py))

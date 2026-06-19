@@ -71,7 +71,7 @@ The txid bytes are the *little-endian* (on-wire) order — the reverse
 of the display order. The vout is a little-endian uint32.
 
 In pyrxd this is the `GlyphRef` dataclass at
-[`src/pyrxd/glyph/types.py`](https://github.com/MudwoodLabs/pyrxd/blob/main/src/pyrxd/glyph/types.py).
+[`src/pyrxd/glyph/types.py`](https://github.com/Radiant-Core/pyrxd/blob/main/src/pyrxd/glyph/types.py).
 You'll see it appear inside `build_ft_locking_script`,
 `build_nft_locking_script`, `build_dmint_v1_contract_script`, etc.
 — anywhere the script needs to reference another on-chain output.
@@ -256,7 +256,7 @@ A real RBG holder pastes `b45dc453befb589aff8bfd76af0b994615b37eda094f48c380eb31
 1. The inspector parses the 72-hex string as a `contract_id` (= 64 hex txid + 8 hex BE vout).
 2. The display txid is `b45dc453…a2a8`; the vout is `0x00000004` = **4**.
 3. The inspector fetches transaction `b45dc453…a2a8` and shows its 13-output deploy shape.
-4. The tx-shape banner (per [PR #61](https://github.com/MudwoodLabs/pyrxd/pull/61)) notes this is an FT deploy — explaining the `commit-nft` companion.
+4. The tx-shape banner (per [PR #61](https://github.com/Radiant-Core/pyrxd/pull/61)) notes this is an FT deploy — explaining the `commit-nft` companion.
 
 Same user, now wanting to see their *transfer* of RBG: pastes a
 **transfer txid** (e.g. `ac7f1f70…0ae4`) instead. Now the inspector

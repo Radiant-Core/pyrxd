@@ -27,11 +27,11 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/MudwoodLabs/pyrxd"
+Homepage = "https://github.com/Radiant-Core/pyrxd"
 Documentation = "https://mudwoodlabs.github.io/pyrxd/"
-Source = "https://github.com/MudwoodLabs/pyrxd"
-Tracker = "https://github.com/MudwoodLabs/pyrxd/issues"
-Changelog = "https://github.com/MudwoodLabs/pyrxd/blob/main/CHANGELOG.md"
+Source = "https://github.com/Radiant-Core/pyrxd"
+Tracker = "https://github.com/Radiant-Core/pyrxd/issues"
+Changelog = "https://github.com/Radiant-Core/pyrxd/blob/main/CHANGELOG.md"
 
 [project.scripts]
 pyrxd = "pyrxd.cli.main:run"

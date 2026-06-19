@@ -175,7 +175,7 @@ Each scenario lists actor → action → asset → control(s) → residual risk.
 - **Action:** User copy-pastes the mnemonic from terminal display; clipboard manager retains history.
 - **Asset:** A1.
 - **Control:** None in v0.3.
-- **Residual risk:** Real. Tracked as [issue #11](https://github.com/MudwoodLabs/pyrxd/issues/11) — add a clipboard-hygiene warning after the Enter gate.
+- **Residual risk:** Real. Tracked as [issue #11](https://github.com/Radiant-Core/pyrxd/issues/11) — add a clipboard-hygiene warning after the Enter gate.
 
 ### S4: Wallet decryption attempt with wrong mnemonic (TA1)
 
@@ -281,7 +281,7 @@ Each scenario lists actor → action → asset → control(s) → residual risk.
 - **Action:** A test asserts on `result.output`, fails for an unrelated reason, pytest's traceback embeds the full output (including the mnemonic) in CI logs.
 - **Asset:** A1 (synthetic — test mnemonics are random per run).
 - **Control:** Tests use disposable mnemonics. CI logs are private.
-- **Residual risk:** Low (synthetic mnemonics never hold real funds). Tracked as [issue #9](https://github.com/MudwoodLabs/pyrxd/issues/9).
+- **Residual risk:** Low (synthetic mnemonics never hold real funds). Tracked as [issue #9](https://github.com/Radiant-Core/pyrxd/issues/9).
 
 ### S18: Same-uid process abuses the signing agent to spend (TA1) — issue #8
 
@@ -369,7 +369,7 @@ Honest list. These are not vulnerabilities; they're places where pyrxd's defense
 
 1. **No third-party crypto audit** of pyrxd's integration of underlying primitives.
 2. **No formal verification of BIP32/39/44 vectors** beyond unit tests. Test vectors come from the BIP specs themselves.
-3. **No fuzz testing of the CLI surface.** [Issue #10.](https://github.com/MudwoodLabs/pyrxd/issues/10)
+3. **No fuzz testing of the CLI surface.** [Issue #10.](https://github.com/Radiant-Core/pyrxd/issues/10)
 4. **No timing-attack analysis** of pyrxd-internal comparisons beyond known-good `hmac.compare_digest` use.
 5. **Memory zeroization is best-effort** — CPython does not guarantee secure memory. The signing agent's only resident **long-lived** secret is the seed (a `SecretBytes`), which IS `memset` on lock. The account xprv is **no longer stored long-lived** (hardening #8/H1): `HdWallet._xprv` is now a property that re-derives the account key from the seed per operation, so on lock the seed is scrubbed and the property fails closed — there is no persistent xprv copy to leak across the unlock window. The residual is now only the **transient** per-operation copy: while a signature is actively being produced, an account xprv / libsecp256k1 key necessarily exists in memory for that moment (you cannot sign without the key), and CPython cannot overwrite those immutable/C copies in place before GC. Their residency until the pages are reused is bounded by the agent's best-effort process hygiene (`mlock`/`PR_SET_DUMPABLE 0`/no core dumps), not a guaranteed erase — do not over-state it as "erased". This is the irreducible floor (the key must be usable to sign), not a design gap.
 
@@ -382,7 +382,7 @@ Honest list. These are not vulnerabilities; they're places where pyrxd's defense
 ### CLI
 
 9. **Broadcast summary doesn't show resolved `owner_pkh` from metadata files.** S7 residual risk. **Should be addressed before v0.3.0 release.**
-10. **No clipboard hygiene warning.** S3 residual risk. [Issue #11.](https://github.com/MudwoodLabs/pyrxd/issues/11)
+10. **No clipboard hygiene warning.** S3 residual risk. [Issue #11.](https://github.com/Radiant-Core/pyrxd/issues/11)
 11. **Mnemonic re-entry per command** is mitigated by the optional `pyrxd agent` (issue #8, Path A′): a sign-on-behalf daemon holds the wallet for an unlock window so the mnemonic is typed once, and the key is removed from the short-lived CLI process entirely (the daemon signs). Residual: while unlocked, a same-uid process can *request* signatures — gated by per-spend confirmation (S18), never by taking the key. The agent is **opt-in**; with it off, the per-command prompt (and its S2/S3 residual risk) remains the default. The agent has not had a third-party audit (gap #1 applies).
 
 ### Protocol

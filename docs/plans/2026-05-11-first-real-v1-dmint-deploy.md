@@ -274,4 +274,4 @@ Once both confirm:
 - M2 concept: `docs/concepts/dmint-v1-deploy.md`
 - Demo: `examples/dmint_v1_deploy_demo.py`
 - M1 mint demo: `examples/dmint_claim_demo.py`
-- PR #66: https://github.com/MudwoodLabs/pyrxd/pull/66
+- PR #66: https://github.com/Radiant-Core/pyrxd/pull/66

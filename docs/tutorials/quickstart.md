@@ -85,7 +85,7 @@ then a **reveal** that publishes the metadata and creates the token output. The
 token's permanent identity is its **genesis ref** — the commit `txid:vout`.
 
 The transaction-building in `regtest_quickstart.py` is the same logic as
-[`examples/glyph_mint_demo.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/examples/glyph_mint_demo.py),
+[`examples/glyph_mint_demo.py`](https://github.com/Radiant-Core/pyrxd/tree/main/examples/glyph_mint_demo.py),
 which mints on mainnet via ElectrumX — only the transport is swapped to the
 local node.
 

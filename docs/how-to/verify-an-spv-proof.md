@@ -67,7 +67,7 @@ parts and the failure modes.
 
 ## What `verify_tx_in_block` actually checks
 
-From [`src/pyrxd/spv/merkle.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/src/pyrxd/spv/merkle.py),
+From [`src/pyrxd/spv/merkle.py`](https://github.com/Radiant-Core/pyrxd/tree/main/src/pyrxd/spv/merkle.py),
 the function runs four defenses in order:
 
 | #   | Check                                          | Raises                                            |
@@ -114,7 +114,7 @@ async with ElectrumXClient(["wss://your.electrumx.server:50002"]) as client:
 ```
 
 `MerklePath` is the BEEF-style proof object from
-[`pyrxd.merkle_path`](https://github.com/MudwoodLabs/pyrxd/tree/main/src/pyrxd/merkle_path.py).
+[`pyrxd.merkle_path`](https://github.com/Radiant-Core/pyrxd/tree/main/src/pyrxd/merkle_path.py).
 If you have a `ChainTracker` (which can fetch headers from a
 `BtcDataSource` and check the Merkle root), `MerklePath.verify` gives
 you a one-liner:
@@ -241,9 +241,9 @@ you hand to downstream covenant builders.
   failure modes this recipe's defenses exist to block
 - [`pyrxd.spv` API reference](../api/spv.rst)
 - [Gravity (cross-chain atomic swap concept)](../concepts/gravity.md)
-- Source: [`src/pyrxd/spv/merkle.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/src/pyrxd/spv/merkle.py),
-  [`proof.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/src/pyrxd/spv/proof.py),
-  [`chain.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/src/pyrxd/spv/chain.py),
-  [`pow.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/src/pyrxd/spv/pow.py)
+- Source: [`src/pyrxd/spv/merkle.py`](https://github.com/Radiant-Core/pyrxd/tree/main/src/pyrxd/spv/merkle.py),
+  [`proof.py`](https://github.com/Radiant-Core/pyrxd/tree/main/src/pyrxd/spv/proof.py),
+  [`chain.py`](https://github.com/Radiant-Core/pyrxd/tree/main/src/pyrxd/spv/chain.py),
+  [`pow.py`](https://github.com/Radiant-Core/pyrxd/tree/main/src/pyrxd/spv/pow.py)
 - Tests with audit-finding coverage:
-  [`tests/test_spv.py`](https://github.com/MudwoodLabs/pyrxd/tree/main/tests/test_spv.py)
+  [`tests/test_spv.py`](https://github.com/Radiant-Core/pyrxd/tree/main/tests/test_spv.py)

@@ -86,7 +86,7 @@ html_static_path = ["_static"]
 # the page can install pyrxd-from-the-current-commit at runtime.
 html_extra_path = ["inspect_static"]
 html_theme_options = {
-    "source_repository": "https://github.com/MudwoodLabs/pyrxd",
+    "source_repository": "https://github.com/Radiant-Core/pyrxd",
     "source_branch": "main",
     "source_directory": "docs/",
 }

@@ -10,8 +10,8 @@ symptoms:
 severity: medium
 status: solved
 related_prs:
-  - https://github.com/MudwoodLabs/pyrxd/pull/14
-  - https://github.com/MudwoodLabs/pyrxd/pull/15
+  - https://github.com/Radiant-Core/pyrxd/pull/14
+  - https://github.com/Radiant-Core/pyrxd/pull/15
 tags:
   - pre-push-hook
   - taskipy

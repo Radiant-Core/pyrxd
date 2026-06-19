@@ -143,8 +143,8 @@ This pattern was applied to a real decision. The shape of the actual case, as ev
 - [docs/solutions/integration-issues/local-ci-parity-via-task-ci-and-pre-push-hook.md](../integration-issues/local-ci-parity-via-task-ci-and-pre-push-hook.md) — First solution doc overall (in `integration-issues`). Different problem class but template for the `docs/solutions/` structure.
 
 **Recent related work:**
-- **PR #14** ([fix/bip44-coin-type-512](https://github.com/MudwoodLabs/pyrxd/pull/14)) — Merged. Default BIP44 path switched from `m/44'/236'/0'` to `m/44'/512'/0'` (Radiant's SLIP-0044 spec-correct value). The technical groundwork that made the migration question worth thinking through carefully.
-- **PR #15** ([chore/local-ci-parity](https://github.com/MudwoodLabs/pyrxd/pull/15)) — Merged. Added `task ci` aggregate command + versioned pre-push hook + installer.
+- **PR #14** ([fix/bip44-coin-type-512](https://github.com/Radiant-Core/pyrxd/pull/14)) — Merged. Default BIP44 path switched from `m/44'/236'/0'` to `m/44'/512'/0'` (Radiant's SLIP-0044 spec-correct value). The technical groundwork that made the migration question worth thinking through carefully.
+- **PR #15** ([chore/local-ci-parity](https://github.com/Radiant-Core/pyrxd/pull/15)) — Merged. Added `task ci` aggregate command + versioned pre-push hook + installer.
 
 **External community input:**
 - **Avian migration precedent** (Discord, May 2026) — Community member with direct production experience of Avian's coin type 175 → 921 migration provided the playbook that independently confirmed the panel's findings: dual-path support inside each wallet, no separate CLI tool.

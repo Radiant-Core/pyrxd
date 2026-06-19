@@ -162,7 +162,7 @@ Send at least `2_500_000` photons (`0.025 RXD`) — that covers the
 `100_000`-photon transfer plus headroom for the fee. The default
 fee rate is `10_000` photons/byte (the current Radiant mainnet
 relay minimum, hard-coded as
-[`pyrxd.wallet.DEFAULT_FEE_RATE`](https://github.com/MudwoodLabs/pyrxd/blob/main/src/pyrxd/wallet.py)),
+[`pyrxd.wallet.DEFAULT_FEE_RATE`](https://github.com/Radiant-Core/pyrxd/blob/main/src/pyrxd/wallet.py)),
 so a 1-input 2-output P2PKH tx runs about `2_250_000` photons of
 fee on its own — yes, high by Bitcoin habits; it is what the
 network requires to relay today.
@@ -360,7 +360,7 @@ Both env vars are required. `DRY_RUN=0` alone refuses to
 broadcast — the script exits 2 with the
 `I_UNDERSTAND_THIS_IS_REAL=yes` reminder. The same pattern is
 used by every broadcast-capable example in
-[`examples/`](https://github.com/MudwoodLabs/pyrxd/tree/main/examples)
+[`examples/`](https://github.com/Radiant-Core/pyrxd/tree/main/examples)
 (`dmint_v1_deploy_demo.py`, `glyph_mint_demo.py`,
 `ft_transfer_demo.py`); copy it into your own scripts so a
 typo or a stale shell variable cannot accidentally publish a
@@ -403,5 +403,5 @@ it is — keep reading on the
 [concepts pages](../concepts/index.md). For deployment
 playbooks (mint a Glyph NFT, deploy a fungible token, run a
 Gravity swap), the
-[`examples/`](https://github.com/MudwoodLabs/pyrxd/tree/main/examples)
+[`examples/`](https://github.com/Radiant-Core/pyrxd/tree/main/examples)
 directory ships runnable end-to-end scripts.

@@ -314,7 +314,7 @@ versions:
    until then it's unaudited, so verify it yourself before real value.
 
 If you have a use case that needs one of the un-shipped pieces, open
-an issue at https://github.com/MudwoodLabs/pyrxd/issues so it can be
+an issue at https://github.com/Radiant-Core/pyrxd/issues so it can be
 prioritized.
 
 ## How to use Gravity safely today
@@ -339,13 +339,13 @@ prioritized.
 
 ## Further reading
 
-- [`pyrxd/gravity/covenant.py`](https://github.com/MudwoodLabs/pyrxd/blob/main/src/pyrxd/gravity/covenant.py)
+- [`pyrxd/gravity/covenant.py`](https://github.com/Radiant-Core/pyrxd/blob/main/src/pyrxd/gravity/covenant.py)
   — covenant artifact loader, deny-list, validation
-- [`pyrxd/gravity/transactions.py`](https://github.com/MudwoodLabs/pyrxd/blob/main/src/pyrxd/gravity/transactions.py)
+- [`pyrxd/gravity/transactions.py`](https://github.com/Radiant-Core/pyrxd/blob/main/src/pyrxd/gravity/transactions.py)
   — finalize / forfeit / cancel transaction builders
-- [`pyrxd/spv/`](https://github.com/MudwoodLabs/pyrxd/tree/main/src/pyrxd/spv)
+- [`pyrxd/spv/`](https://github.com/Radiant-Core/pyrxd/tree/main/src/pyrxd/spv)
   — SPV proof construction and verification
-- [`examples/gravity_swap_demo.py`](https://github.com/MudwoodLabs/pyrxd/blob/main/examples/gravity_swap_demo.py)
+- [`examples/gravity_swap_demo.py`](https://github.com/Radiant-Core/pyrxd/blob/main/examples/gravity_swap_demo.py)
   — runnable end-to-end demo
-- [`examples/gravity_full_trade.py`](https://github.com/MudwoodLabs/pyrxd/blob/main/examples/gravity_full_trade.py)
+- [`examples/gravity_full_trade.py`](https://github.com/Radiant-Core/pyrxd/blob/main/examples/gravity_full_trade.py)
   — full live-network trade walkthrough

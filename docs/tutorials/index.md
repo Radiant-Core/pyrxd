@@ -66,8 +66,8 @@ Once you've worked through the tutorials, the task-focused
 [How-to guides](../how-to/index.md) cover the next steps — transferring a token
 after you mint it, running the signing agent, recovering funds, and building a
 cross-chain swap. The runnable end-to-end demos in
-[`examples/`](https://github.com/MudwoodLabs/pyrxd/tree/main/examples) exercise
+[`examples/`](https://github.com/Radiant-Core/pyrxd/tree/main/examples) exercise
 the same flows in code.
 
 If you have a use case that would make a useful tutorial, please open an
-[issue](https://github.com/MudwoodLabs/pyrxd/issues) describing it.
+[issue](https://github.com/Radiant-Core/pyrxd/issues) describing it.

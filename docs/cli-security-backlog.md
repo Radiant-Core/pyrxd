@@ -33,11 +33,11 @@ the source of truth for status, assignment, and progress**.
 
 | # | Topic | GitHub issue |
 |---|-------|--------------|
-| 1 | Mnemonic re-entry / agent-process unlock | [#8](https://github.com/MudwoodLabs/pyrxd/issues/8) |
-| 2 | Mnemonic in pytest result.output captures | [#9](https://github.com/MudwoodLabs/pyrxd/issues/9) |
-| 3 | `pyrxd setup` JSON-mode policy | [#12](https://github.com/MudwoodLabs/pyrxd/issues/12) |
-| 4 | Fuzz testing the CLI | [#10](https://github.com/MudwoodLabs/pyrxd/issues/10) |
-| 5 | Mnemonic clipboard hygiene | [#11](https://github.com/MudwoodLabs/pyrxd/issues/11) |
+| 1 | Mnemonic re-entry / agent-process unlock | [#8](https://github.com/Radiant-Core/pyrxd/issues/8) |
+| 2 | Mnemonic in pytest result.output captures | [#9](https://github.com/Radiant-Core/pyrxd/issues/9) |
+| 3 | `pyrxd setup` JSON-mode policy | [#12](https://github.com/Radiant-Core/pyrxd/issues/12) |
+| 4 | Fuzz testing the CLI | [#10](https://github.com/Radiant-Core/pyrxd/issues/10) |
+| 5 | Mnemonic clipboard hygiene | [#11](https://github.com/Radiant-Core/pyrxd/issues/11) |
 
 ### 1. Mnemonic re-entry per command (UX → security trade)
 

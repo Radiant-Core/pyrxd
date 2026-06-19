@@ -63,7 +63,7 @@ _MAX_ATTRS_COUNT = 64  # unreasonable beyond this; prevents memory bombs
 # leaves room for parameters (``; charset=…``) without ever being a
 # meaningful expansion vector. A higher cap was attacker-surface for
 # downstream display strings constructed from this field — see
-# https://github.com/MudwoodLabs/pyrxd/issues/52.
+# https://github.com/Radiant-Core/pyrxd/issues/52.
 _MAX_MIME_TYPE_CHARS = 256
 
 
