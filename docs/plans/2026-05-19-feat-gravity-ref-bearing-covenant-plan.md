@@ -662,7 +662,7 @@ paying BTC. Build it as a first-class deliverable.
 - [ ] **Phantom-metadata warning** (Security UX): when the resolver
   shows the same `btcReceiveHash` on another live ref-bearing offer,
   the result includes a warning (`VerifyResult.warnings`). Documented
-  in [docs/red-team-checklist.md](../red-team-checklist.md) as a
+  in [SECURITY.md](../../SECURITY.md) Part V as a
   Taker-visible risk; out of v1 enforcement scope.
 
 **Tests (in `tests/test_gravity_ref_verify.py`):**
@@ -936,7 +936,7 @@ Out of scope for v1 but design-aware:
 | Doc | Update |
 |---|---|
 | [docs/concepts/gravity.md](../concepts/gravity.md) | New "ref-bearing covenant" section; status table; v1 limitations |
-| [docs/red-team-checklist.md](../red-team-checklist.md) | New red-team categories: multi-ref smuggling, SPV proof reuse across offers, sort-order consensus, phantom metadata, duplicate-offer disambiguation |
+| [SECURITY.md](../../SECURITY.md) Part V | New red-team categories: multi-ref smuggling, SPV proof reuse across offers, sort-order consensus, phantom metadata, duplicate-offer disambiguation |
 | [docs/brainstorms/2026-05-MM-gravity-ref-spike-findings.md](../brainstorms/) | New (Phase 2 deliverable) |
 | [docs/audits/2026-MM-DD-ref-covenant-audit.md](../audits/) | New (Phase 7 deliverable, audit 06 index target) |
 | [CHANGELOG.md](../../CHANGELOG.md) | Unreleased "Added" entries for FT/NFT artifacts + Taker verification API |
@@ -968,7 +968,7 @@ Out of scope for v1 but design-aware:
 - **Lazy public API:** [src/pyrxd/__init__.py](../../src/pyrxd/__init__.py),
   [gravity/__init__.py](../../src/pyrxd/gravity/__init__.py)
 - **WAVE resolver:** [glyph/wave.py:206-264](../../src/pyrxd/glyph/wave.py#L206)
-- **Photonic reference:** `docs/dmint-research-photonic.md` §2.1 (ref-preservation pattern)
+- **Photonic reference:** `docs/DMINT_RESEARCH.md` §2.1 (ref-preservation pattern)
 
 ### Conventions
 
@@ -986,7 +986,7 @@ Out of scope for v1 but design-aware:
 
 - [docs/brainstorms/2026-05-19-gravity-bch-spike-findings.md](../brainstorms/2026-05-19-gravity-bch-spike-findings.md) — BCH-support spike (informs the SPV reuse story)
 - [docs/brainstorms/2026-05-19-gravity-p2pkh-spike-findings.md](../brainstorms/2026-05-19-gravity-p2pkh-spike-findings.md) — P2PKH support, informed BTC-output dispatch reuse
-- [docs/dmint-followup.md](../dmint-followup.md), [docs/threat-model.md](../threat-model.md), [docs/red-team-checklist.md](../red-team-checklist.md) — adjacent security context
+- [docs/DMINT_RESEARCH.md](../DMINT_RESEARCH.md), [SECURITY.md](../../SECURITY.md) — adjacent security context
 
 ### Institutional learnings applied (recurring failure modes prevented)
 

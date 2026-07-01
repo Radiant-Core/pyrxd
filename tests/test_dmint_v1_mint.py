@@ -242,7 +242,7 @@ class TestBuildDmintV1ContractScript:
     def test_code_script_length(self):
         # The V1 code epilogue starts with 0xbd (OP_STATESEPARATOR — part of
         # the epilogue itself, not a separator emitted by the contract builder)
-        # and is 145 bytes total per docs/dmint-research-mainnet.md §3.
+        # and is 145 bytes total per docs/DMINT_RESEARCH.md §3.
         for algo in (DmintAlgo.SHA256D, DmintAlgo.BLAKE3, DmintAlgo.K12):
             code = build_dmint_v1_code_script(algo)
             assert len(code) == 145
@@ -253,7 +253,7 @@ class TestBuildDmintV1FtOutputScript:
     """Golden-vector tests for the V1 mint reward output (75-byte FT shape).
 
     The bytes here come from a real Radiant mainnet mint tx
-    (`146a4d68…f3c`, vout[1]) decoded in docs/dmint-research-mainnet.md §4.
+    (`146a4d68…f3c`, vout[1]) decoded in docs/DMINT_RESEARCH.md §4.
     The V1 covenant's ``OP_CODESCRIPTHASHVALUESUM_OUTPUTS`` step at offset
     168 of the contract epilogue hashes the prefix 0xd0 + tokenRef + the
     12-byte fingerprint and requires the FT output's codescript-hash to
@@ -261,7 +261,7 @@ class TestBuildDmintV1FtOutputScript:
     builds is rejected by the network.
     """
 
-    # Mainnet `146a4d68…f3c` vout[1] decoded at docs/dmint-research-mainnet.md:226-228
+    # Mainnet `146a4d68…f3c` vout[1] decoded at docs/DMINT_RESEARCH.md:226-228
     _MAINNET_PKH = bytes.fromhex("e9aa4adbe3a3f07887d67d9cedae324711f053ef")
     _MAINNET_TOKEN_REF = GlyphRef.from_bytes(
         bytes.fromhex("8b87c3c771b1a9f5015a4f26bfd80979ed196b5366257a6f30929646dfd943a4" + "00000000")

@@ -884,7 +884,7 @@ function _detectTxShape(payload) {
   // 1–2 P2PKH outputs — change + maybe one initial-holder). The N
   // ref-seeds are 1-photon outputs but we don't have satoshis info per
   // type, so use count as the discriminator. See
-  // docs/dmint-research-photonic-deploy.md §2 for the byte-by-byte
+  // docs/DMINT_RESEARCH.md §2 for the byte-by-byte
   // chain truth.
   if (has("commit-ft") && has("commit-nft") && (counts["p2pkh"] || 0) >= 3) {
     const refSeeds = (counts["p2pkh"] || 0) - 1; // subtract the 1 change
@@ -896,7 +896,7 @@ function _detectTxShape(payload) {
       `1-photon ref-seeds, one per parallel dMint contract. The deploy ` +
       `reveal that follows will spend all of these to create the same ` +
       `number of parallel V1 dMint contract UTXOs. See ` +
-      `docs/dmint-research-photonic-deploy.md for the on-chain shape.`
+      `docs/DMINT_RESEARCH.md for the on-chain shape.`
     );
   }
 

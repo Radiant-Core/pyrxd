@@ -636,7 +636,7 @@ def build_dmint_contract_script(params: DmintDeployParams) -> bytes:
 # V1 is the only dMint contract format observed on Radiant mainnet. It has 6
 # state items (height, contractRef, tokenRef, maxHeight, reward, target) and
 # a 145-byte fixed code epilogue with one selector byte for the algorithm.
-# Documented in docs/dmint-research-mainnet.md §2.2 (byte-by-byte) and §3
+# Documented in docs/DMINT_RESEARCH.md §2.2 (byte-by-byte) and §3
 # (common template). The V1 parser (DmintState._from_v1_script) and
 # fingerprint helpers (_match_v1_epilogue) are the inverse of these.
 
@@ -663,7 +663,7 @@ _V1_ENUM_TO_ALGO_BYTE: dict[DmintAlgo, int] = {enum: byte for byte, enum in _V1_
 #   0xee = OP_BLAKE3    → BLAKE3
 #   0xef = OP_K12       → K12
 # We fingerprint the epilogue with that one byte wildcarded.
-# Sources: docs/dmint-research-mainnet.md §2.2 (byte-by-byte decode of a
+# Sources: docs/DMINT_RESEARCH.md §2.2 (byte-by-byte decode of a
 # real mainnet V1 contract), §3 ("Common template" block, offsets 79+).
 #
 # NOTE: These constants are defined in builders.py (not chain.py as the
@@ -705,7 +705,7 @@ def build_dmint_v1_state_script(
 ) -> bytes:
     """Build the 6-item V1 dMint state script (before OP_STATESEPARATOR).
 
-    Layout (docs/dmint-research-mainnet.md §2.2 offsets 0–94)::
+    Layout (docs/DMINT_RESEARCH.md §2.2 offsets 0–94)::
 
         height(4B LE) | d8 contractRef(36B) | d0 tokenRef(36B) |
         maxHeight | reward | target(0x08 + 8B LE)
@@ -783,7 +783,7 @@ def build_dmint_v1_code_script(algo: DmintAlgo) -> bytes:
 # (`_V1_EPILOGUE_SUFFIX` opcodes 01 d0 53 79 7e 0c <12 bytes> 7e aa). The
 # miner's reward output script must end with these exact bytes so that
 # the FT-conservation check passes.
-# Source: docs/dmint-research-mainnet.md §2.2 offset 148, §4 vout[1] hex.
+# Source: docs/DMINT_RESEARCH.md §2.2 offset 148, §4 vout[1] hex.
 _V1_FT_OUTPUT_EPILOGUE = bytes.fromhex("dec0e9aa76e378e4a269e69d")
 
 
@@ -793,7 +793,7 @@ def build_dmint_v1_ft_output_script(
 ) -> bytes:
     """Build the 75-byte P2PKH-wrapped FT output that a V1 mint produces.
 
-    Layout (docs/dmint-research-mainnet.md §4 vout[1])::
+    Layout (docs/DMINT_RESEARCH.md §4 vout[1])::
 
         76 a9 14 <pkh:20>     OP_DUP OP_HASH160 PUSH20 pkh
         88 ac                 OP_EQUALVERIFY OP_CHECKSIG    (25-byte P2PKH prologue)
@@ -834,7 +834,7 @@ def build_dmint_v1_contract_script(
     separate ``_OP_STATESEPARATOR``), this function concatenates state and
     epilogue directly. Total length is 241 bytes for typical mainnet
     parameters (96-byte state + 145-byte epilogue), matching the byte-by-byte
-    decode in docs/dmint-research-mainnet.md §2.2.
+    decode in docs/DMINT_RESEARCH.md §2.2.
 
     The output of this function round-trips through
     :meth:`DmintState.from_script` with ``is_v1=True``.

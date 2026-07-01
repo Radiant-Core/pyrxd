@@ -348,7 +348,7 @@ class GlyphBuilder:
         """Build the V1 deploy commit + placeholder contract scripts.
 
         Mirrors the on-chain shape decoded in
-        ``docs/dmint-research-photonic-deploy.md`` §2 and §3:
+        ``docs/DMINT_RESEARCH.md`` §2 and §3:
 
         * Commit tx: 1 FT-commit hashlock + ``num_contracts`` ref-seed
           P2PKHs + 1 NFT-commit hashlock + change. (This method builds
@@ -374,7 +374,7 @@ class GlyphBuilder:
         if params.premine_amount is not None:
             raise ValidationError(
                 "V1 deploy with premine is deferred work — see "
-                "docs/dmint-research-photonic-deploy.md §7.2. Set "
+                "docs/DMINT_RESEARCH.md §7.2. Set "
                 "premine_amount=None for now."
             )
 
@@ -882,7 +882,7 @@ class DmintV1DeployParams:
     a contract UTXO and re-creating it at height+1 with the same script
     template; the reward is paid from a miner-supplied funding input.
 
-    See ``docs/dmint-research-photonic-deploy.md`` for the byte-by-byte
+    See ``docs/DMINT_RESEARCH.md`` for the byte-by-byte
     chain shape this dataclass drives. Live mainnet example: Radiant
     Glyph Protocol (GLYPH) at commit a443d9df…878b → reveal b965b32d…9dd6.
 
@@ -904,7 +904,7 @@ class DmintV1DeployParams:
         Translated to 8-byte target via :func:`difficulty_to_target`.
     :param premine_amount:     Photons to send to ``owner_pkh`` on the
         reveal tx as an optional premine FT output. ``None`` = no premine.
-        Filed as deferred work in M2 (`docs/dmint-research-photonic-deploy.md` §7.2);
+        Filed as deferred work in M2 (`docs/DMINT_RESEARCH.md` §7.2);
         accepted in the dataclass but rejected at build time for now.
     :param op_return_msg:      Optional OP_RETURN data carrier (raw bytes
         after the 0x6a prefix). ``None`` = no OP_RETURN output.
@@ -1156,7 +1156,7 @@ class DmintV1DeployResult:
         if self.premine_amount is not None:
             raise NotImplementedError(
                 "V1 deploy with premine is deferred work — see "
-                "docs/dmint-research-photonic-deploy.md §7.2. Set "
+                "docs/DMINT_RESEARCH.md §7.2. Set "
                 "premine_amount=None for now."
             )
 

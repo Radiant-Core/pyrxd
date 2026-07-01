@@ -10,7 +10,7 @@ subagents run in parallel against the same target, each focused on
 its own dimension. The orchestrating Claude instance synthesizes
 their reports into a single severity-bucketed summary.
 
-See `docs/security-review-playbook.md` §4 for what this technique
+See `SECURITY.md` Part IV §4 for what this technique
 caught in pyrxd's 0.5.0 audit (V2 reward-shape bug, broad-except
 leak, missing FT golden vector, V2 quarantine recommendation).
 
@@ -275,7 +275,7 @@ extra setup.
 
 ## See also
 
-* `docs/security-review-playbook.md` §4 — what this technique
+* `SECURITY.md` Part IV §4 — what this technique
   caught in pyrxd's 0.5.0 audit, in case-study form.
 * `~/.claude/skills/security-review/SKILL.md` — the depth-first
   "no finding without a working exploit" complement to this skill.

@@ -26,7 +26,7 @@ today with no version parameter — it always emits a **V2** contract via
 against mainnet right now would issue a non-standard token:
 
 - **Zero live V2 contracts exist on mainnet.** All seven decoded
-  contracts in [`docs/dmint-research-mainnet.md`](../dmint-research-mainnet.md)
+  contracts in [`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md)
   are V1.
 - **glyph-miner targets V1 only** (4-byte nonce, V1 OP_PICK indices in
   the locking script). It cannot mine a V2 deploy without code
@@ -41,7 +41,7 @@ out indefinitely.
 
 ## Why This Matters
 
-`docs/dmint-followup.md` is **stale** — it describes pyrxd as having only
+`docs/DMINT_RESEARCH.md` is **stale** — it describes pyrxd as having only
 the premine path with PoW listed as future work. The actual code in
 [`src/pyrxd/glyph/dmint.py`](../../src/pyrxd/glyph/dmint.py) (1,268 lines)
 already contains:
@@ -57,7 +57,7 @@ What is **actually** missing:
 1. **V1 mint builder.** [`build_dmint_mint_tx`](../../src/pyrxd/glyph/dmint.py#L1019)
    refuses V1 contracts at [L1091](../../src/pyrxd/glyph/dmint.py#L1091).
    All seven live mainnet contracts decoded in
-   [`docs/dmint-research-mainnet.md`](../dmint-research-mainnet.md) are V1.
+   [`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md) are V1.
    So pyrxd can read them but not spend them.
 2. **No nonce-grinding loop.** Only solution verification ships, not mining.
 3. **No live-mint integration test.** Tests round-trip against synthetic
@@ -110,7 +110,7 @@ in place).
 5. **`testmempoolaccept` is a smoke check, not the bar.** It catches
    structural errors but does not exercise covenant verification.
 
-6. **`docs/dmint-followup.md` gets rewritten in Milestone 2** as a
+6. **`docs/DMINT_RESEARCH.md` gets rewritten in Milestone 2** as a
    how-dMint-works document, not future-work. The current framing is
    actively misleading.
 
@@ -119,7 +119,7 @@ in place).
 **Lands:**
 - V1 path in `build_dmint_mint_tx` (or a sibling V1 builder)
 - V1 preimage layout (4-byte nonce, scriptSig is `[nonce, inputHash, outputHash, OP_0]` per
-  [`docs/dmint-research-mainnet.md`](../dmint-research-mainnet.md) §4)
+  [`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md) §4)
 - `pyrxd.glyph.dmint.mine_solution(...)` — pure-Python, returns nonce
 - The preimage byte layout lives in code with comments explaining the wire
   shape — sufficient for external miners to interoperate. Not a separate
@@ -147,7 +147,7 @@ in place).
 - Cross-tool verification: confirm glyph-miner can mine the token we
   deployed (this is the real interoperability gate, not a pyrxd-talking-
   to-pyrxd round-trip)
-- Rewrite of `docs/dmint-followup.md` as how-it-works
+- Rewrite of `docs/DMINT_RESEARCH.md` as how-it-works
 - Example `examples/dmint_deploy_demo.py` (V1)
 
 **Out of scope for Milestone 2:**
@@ -172,7 +172,7 @@ by existing parser tests.)
 ## Decisions Folded In From Review
 
 **Real V1 target = RBG.** Per
-[`docs/dmint-research-mainnet.md`](../dmint-research-mainnet.md) §2.3,
+[`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md) §2.3,
 RBG's contract has `maxHeight=628,328` with observed heights clustered
 around 90,078 as of 2026-04-22. At ~14% mined with hundreds of thousands
 of mints to go, it is unambiguously still active for the foreseeable
@@ -186,7 +186,7 @@ future. No chain query needed to confirm.
    not a guessed number.
 
 2. **Preimage-layout source of truth.** The V1 layout is inferred from
-   live tx + locking script per `docs/dmint-research-mainnet.md` §5.
+   live tx + locking script per `docs/DMINT_RESEARCH.md` §5.
    Read Photonic's `mine.ts` to confirm before building, or treat the
    live-tx evidence as sufficient and let a real-mint broadcast be the
    tiebreaker?
@@ -197,13 +197,13 @@ future. No chain query needed to confirm.
 
 4. **Followup-doc rewrite timing.** Land the rewrite with Milestone 2, or
    add an "out of date — see code" warning at the top of
-   `docs/dmint-followup.md` immediately to stop misleading readers?
+   `docs/DMINT_RESEARCH.md` immediately to stop misleading readers?
 
 ## References
 
-- [`docs/dmint-followup.md`](../dmint-followup.md) — stale; to be rewritten
-- [`docs/dmint-research-photonic.md`](../dmint-research-photonic.md) — Photonic Wallet TS reference
-- [`docs/dmint-research-mainnet.md`](../dmint-research-mainnet.md) — live V1 contract decode + mint trace
+- [`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md) — stale; to be rewritten
+- [`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md) — Photonic Wallet TS reference
+- [`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md) — live V1 contract decode + mint trace
 - [`src/pyrxd/glyph/dmint.py`](../../src/pyrxd/glyph/dmint.py) — current implementation
 - [`src/pyrxd/glyph/builder.py:291`](../../src/pyrxd/glyph/builder.py#L291) — `prepare_dmint_deploy`
 - External: the `glyph-miner` project — fast miner reference (not pyrxd)

@@ -88,9 +88,9 @@ parallel-mining
 ## Adjacent reading (not yet promoted to concept docs)
 
 The research notes in
-[`docs/dmint-research-photonic.md`](../dmint-research-photonic.md),
-[`docs/dmint-research-mainnet.md`](../dmint-research-mainnet.md), and
-[`docs/dmint-followup.md`](../dmint-followup.md) cover slices of dMint
+[`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md),
+[`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md), and
+[`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md) cover slices of dMint
 material at protocol-implementer depth.
 
 ## Planned concept articles

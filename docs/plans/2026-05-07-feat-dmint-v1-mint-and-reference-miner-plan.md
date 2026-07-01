@@ -62,7 +62,7 @@ as the builder. Both fixes ship in this hardening pass:
 1. **Wrong mint-tx output shape.** The first implementation produced
    2 outputs (contract recreate + plain P2PKH reward) with the contract
    value decremented by `reward + fee` per mint. The mainnet V1 covenant
-   trace (docs/dmint-research-mainnet.md §4) shows the actual shape:
+   trace (docs/DMINT_RESEARCH.md §4) shows the actual shape:
    - 4 outputs: contract recreate, **75-byte P2PKH-wrapped FT** reward
      carrying the tokenRef, optional OP_RETURN msg, miner change
    - 2 inputs: contract UTXO + **separate plain-RXD funding input**
@@ -245,7 +245,7 @@ Current state: pyrxd parses V1 contracts but [`build_dmint_mint_tx`
 explicitly refuses them at dmint.py:1091](../../src/pyrxd/glyph/dmint.py#L1091),
 because spending V1 through the V2 builder produces an output the V1
 covenant rejects. All seven live mainnet contracts are V1 per
-[docs/dmint-research-mainnet.md §2.3](../dmint-research-mainnet.md), so
+[docs/DMINT_RESEARCH.md §2.3](../DMINT_RESEARCH.md), so
 the V2-only mint path is unusable on mainnet today.
 
 ## Problem Statement
@@ -513,7 +513,7 @@ difficulty without explicit opt-in.
 
 - [ ] One mint against a live V1 contract on mainnet (RBG target —
   contract at maxHeight 628,328, currently ~14% mined per
-  [docs/dmint-research-mainnet.md §2.3](../dmint-research-mainnet.md))
+  [docs/DMINT_RESEARCH.md §2.3](../DMINT_RESEARCH.md))
   confirmed on-chain. Tx hash recorded in milestone close-out note.
 
 ### Documentation
@@ -526,7 +526,7 @@ difficulty without explicit opt-in.
   - Per-attempt support for an external miner via the `EXTERNAL_MINER` env var (delegates to glyph-miner via `mine_solution_external`)
   - `OP_RETURN_MSG=NONE` escape hatch for users who want to test without the Photonic msg marker
   - Stale-state recovery: print failure + reason on broadcast rejection, exit non-zero so the user re-runs (no automatic retry — mining a new preimage is required because the contractRef-bound preimage goes stale on chain advance)
-- [x] `docs/dmint-followup.md` gets an "out of date — see code" warning
+- [x] `docs/DMINT_RESEARCH.md` gets an "out of date — see code" warning
   at the top (full rewrite lands in Milestone 2). Banner cites the
   authoritative current sources (`dmint.py`, `builder.py`,
   `examples/dmint_claim_demo.py`, the plan itself) and lists what's
@@ -558,7 +558,7 @@ difficulty without explicit opt-in.
 
 ### Risks
 
-- **Stale `dmint-research-mainnet.md` open question on input/output
+- **Stale `DMINT_RESEARCH.md` open question on input/output
   hash construction** — RESOLVED by glyph-miner reference: each is
   `SHA256d(serialized_script)` of the miner's chosen funding-input
   script and OP_RETURN output script. Encoded in code now, not just
@@ -566,7 +566,7 @@ difficulty without explicit opt-in.
 - **OP_RETURN "msg" output may or may not be covenant-required.**
   Photonic convention pushes `<6d7367 ("msg")> <message>` as vout[2]
   in the example mint trace at
-  [docs/dmint-research-mainnet.md §4](../dmint-research-mainnet.md). The V1 covenant
+  [docs/DMINT_RESEARCH.md §4](../DMINT_RESEARCH.md). The V1 covenant
   bytecode walk does not appear to enforce a specific OP_RETURN format,
   but this is unconfirmed. **Mitigation:** include the canonical "msg"
   OP_RETURN in our V1 mint to match what every observed mainnet mint
@@ -592,7 +592,7 @@ Punted to Milestone 2 (V1 deploy):
   emits V2 with no opt-out — see "Deploy-footgun mitigation in M1"
   below for the minimal stop-gap M1 should ship)
 - Cross-tool verification (glyph-miner mines the pyrxd-deployed token)
-- Full rewrite of `docs/dmint-followup.md`
+- Full rewrite of `docs/DMINT_RESEARCH.md`
 - Example `examples/dmint_deploy_demo.py`
 
 Deferred to M3 (indefinite — only if/when someone wants V2's DAA
@@ -663,8 +663,8 @@ Acceptance: both guards in place. Test confirms the
 - [`tests/test_dmint_deploy_integration.py:488`](../../tests/test_dmint_deploy_integration.py#L488) — VPS testmempoolaccept pattern
 - [`examples/ft_deploy_premine.py`](../../examples/ft_deploy_premine.py) — env-var/DRY_RUN/resume pattern for the demo script
 - [`examples/ft_transfer_demo.py`](../../examples/ft_transfer_demo.py) — `is_ft_script` precondition pattern
-- [`docs/dmint-research-mainnet.md`](../dmint-research-mainnet.md) — live V1 contract decode + mint trace
-- [`docs/dmint-research-photonic.md`](../dmint-research-photonic.md) — Photonic Wallet TS reference
+- [`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md) — live V1 contract decode + mint trace
+- [`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md) — Photonic Wallet TS reference
 - [`docs/solutions/logic-errors/dmint-v1-classifier-gap.md`](../solutions/logic-errors/dmint-v1-classifier-gap.md) — prior incident: V1 classifier gap exposed by RBG live test (drives the synthetic-then-real testing approach)
 
 ### External references
@@ -684,4 +684,4 @@ Acceptance: both guards in place. Test confirms the
 
 - `src/pyrxd/glyph/dmint.py` — V1 branch in `build_dmint_mint_tx`,
   `mine_solution`, parameterized verifier, V1 code-script helper
-- `docs/dmint-followup.md` — top-of-file "stale" warning
+- `docs/DMINT_RESEARCH.md` — top-of-file "stale" warning

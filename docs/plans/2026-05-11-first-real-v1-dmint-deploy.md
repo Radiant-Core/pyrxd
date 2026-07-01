@@ -256,7 +256,7 @@ Once both confirm:
 | Reveal broadcast rejected: bad-sig               | Wrong sighash preimage or key                             | Verify `funding_pkh_lock` matches the deployer's address                         |
 | RXinDexer ignores the deploy                     | CBOR shape wrong (`v` field present, `p` wrong)           | Test pin (`TestV1CborShape`) already guards this — but double-check raw CBOR     |
 | Inspector doesn't find contract outputs          | State items in wrong order                                | Byte-equal golden vector guards this — investigate parser-side                   |
-| Mining returns "not exhausted, but balance off"  | Reward emission shape mismatch                            | Compare mint preimage to M1 mainnet trace at `docs/dmint-research-mainnet.md`    |
+| Mining returns "not exhausted, but balance off"  | Reward emission shape mismatch                            | Compare mint preimage to M1 mainnet trace at `docs/DMINT_RESEARCH.md`    |
 
 ## Out of scope for this first deploy
 
@@ -270,7 +270,7 @@ Once both confirm:
 ## References
 
 - M2 plan: `docs/plans/2026-05-08-feat-dmint-v1-deploy-plan.md`
-- M2 research: `docs/dmint-research-photonic-deploy.md`
+- M2 research: `docs/DMINT_RESEARCH.md`
 - M2 concept: `docs/concepts/dmint-v1-deploy.md`
 - Demo: `examples/dmint_v1_deploy_demo.py`
 - M1 mint demo: `examples/dmint_claim_demo.py`

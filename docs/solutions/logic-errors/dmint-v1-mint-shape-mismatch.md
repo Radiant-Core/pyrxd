@@ -15,7 +15,7 @@ tags: [dmint, v1, mint, builder, golden-vectors, covenant, mainnet, recurring-pa
 related_files:
   - src/pyrxd/glyph/dmint.py
   - tests/test_dmint_v1_mint.py
-  - docs/dmint-research-mainnet.md
+  - docs/DMINT_RESEARCH.md
 related_solutions:
   - docs/solutions/logic-errors/dmint-v1-classifier-gap.md
 ---
@@ -26,7 +26,7 @@ The first V1 dMint mint implementation produced transactions that the
 Radiant mainnet covenant would have rejected, but every synthetic
 test passed. Specifically:
 
-| Aspect | pyrxd built (broken) | Mainnet expects (per `docs/dmint-research-mainnet.md` §4) |
+| Aspect | pyrxd built (broken) | Mainnet expects (per `docs/DMINT_RESEARCH.md` §4) |
 |---|---|---|
 | Inputs | 1 (contract only) | 2 (contract + plain-RXD funding) |
 | Outputs | 2 (contract recreate + plain P2PKH reward) | 3–4 (contract recreate + 75-byte FT-wrapped reward + optional OP_RETURN msg + change) |
@@ -79,7 +79,7 @@ fingerprint`), and requires the total to equal `state.reward`. The
 miner cannot satisfy this with a plain P2PKH reward output — there is
 no FT codescript to sum.
 
-The mainnet shape (decoded at `docs/dmint-research-mainnet.md`
+The mainnet shape (decoded at `docs/DMINT_RESEARCH.md`
 §4 vout[1]):
 
 ```
@@ -109,7 +109,7 @@ was committed. The red-team finding was unambiguous:
 > not return a DmintMintResult."*
 
 The reviewer did what the unit tests didn't: walked the mainnet trace
-in `docs/dmint-research-mainnet.md` §4 byte-by-byte against pyrxd's
+in `docs/DMINT_RESEARCH.md` §4 byte-by-byte against pyrxd's
 output.
 
 ## The Fix
@@ -238,6 +238,6 @@ correction baked into pyrxd's test layer (the
 
 - Fix commit: `a3ee46e fix(glyph): correct V1 dMint mint-tx shape + harden deploy guard + token-burn defense`
 - Follow-up: `1a8d712 fix(glyph): opcode-aware funding scan + OP_RETURN msg marker + V2 default regression test`
-- Mainnet trace: [`docs/dmint-research-mainnet.md`](../../dmint-research-mainnet.md) §4
+- Mainnet trace: [`docs/DMINT_RESEARCH.md`](../../DMINT_RESEARCH.md) §4
 - Prior incident: [`docs/solutions/logic-errors/dmint-v1-classifier-gap.md`](dmint-v1-classifier-gap.md)
 - Plan: [`docs/plans/2026-05-07-feat-dmint-v1-mint-and-reference-miner-plan.md`](../../plans/2026-05-07-feat-dmint-v1-mint-and-reference-miner-plan.md)

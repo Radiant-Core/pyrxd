@@ -472,7 +472,7 @@ the 0.5.0 pattern-recognition audit and ships the time-lock builders
   commit + reveal scripts for the mainnet-canonical "one reveal,
   many parallel contract UTXOs" shape that every live dMint token
   (RBG, snk, etc.) uses. Pinned against Photonic-Wallet's reference
-  layout (`docs/dmint-research-photonic-deploy.md` §2/§3).
+  layout (`docs/DMINT_RESEARCH.md` §2/§3).
 - `DmintV1DeployParams` / `DmintV1DeployResult` / `DmintV1ContractInitialState`
   — typed inputs/outputs for the V1 deploy flow.
 - `find_dmint_contract_utxos` — chain helper that walks ElectrumX to
@@ -912,15 +912,15 @@ covenant variants in this module are experimental.
 
 ### Documentation
 
-- `docs/dmint-followup.md` — premine vs PoW dMint scope.
-- `docs/dmint-research-photonic.md` — Photonic Wallet TS reverse
+- `docs/DMINT_RESEARCH.md` — premine vs PoW dMint scope.
+- `docs/DMINT_RESEARCH.md` — Photonic Wallet TS reverse
   engineering.
-- `docs/dmint-research-mainnet.md` — decoded live mainnet dMint
+- `docs/DMINT_RESEARCH.md` — decoded live mainnet dMint
   contracts.
 
 ### Known limitations
 
-- **dMint PoW-based distributed FT mint not implemented.** Premine-at-deploy works via `prepare_ft_deploy_reveal`. PoW commit/reveal + ASERT/LWMA difficulty adjustment is documented as future work in `docs/dmint-followup.md`. Premine-only consumers do not need it.
+- **dMint PoW-based distributed FT mint not implemented.** Premine-at-deploy works via `prepare_ft_deploy_reveal`. PoW commit/reveal + ASERT/LWMA difficulty adjustment is documented as future work in `docs/DMINT_RESEARCH.md`. Premine-only consumers do not need it.
 - **Gravity covenant variants beyond sentinel-artifact** are
   experimental and have not been audited.
 - **No third-party security audit yet.** Use at your own risk in

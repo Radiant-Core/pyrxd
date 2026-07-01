@@ -64,7 +64,7 @@ Threat-model notes
   signed in a separate pass, then attached in a final pass. Partial
   failure leaves the tx untouched.
 
-See ``docs/dmint-research-photonic-deploy.md`` for the byte-by-byte
+See ``docs/DMINT_RESEARCH.md`` for the byte-by-byte
 chain truth this demo emits against.
 """
 
@@ -304,7 +304,7 @@ def _build_commit_tx(
 
     Output layout (mirrors the on-chain GLYPH commit at
     ``a443d9df…878b`` documented in
-    ``docs/dmint-research-photonic-deploy.md`` §2):
+    ``docs/DMINT_RESEARCH.md`` §2):
 
     * vout 0:        the 75-byte FT-commit hashlock
     * vouts 1..N:    ``num_contracts`` × 1-photon P2PKH ref-seeds
@@ -312,7 +312,7 @@ def _build_commit_tx(
 
     Note: the on-chain GLYPH commit also had a 75-byte *NFT-commit*
     hashlock at vout N+1 (for the auth NFT). The pyrxd M2 demo skips
-    this — see ``docs/dmint-research-photonic-deploy.md`` §6 for the
+    this — see ``docs/DMINT_RESEARCH.md`` §6 for the
     "mint-fresh vs forward-prior" decision: M2 picks mint-fresh
     *without* the auth NFT to keep the demo focused on the dMint
     machinery itself. A future milestone can layer the auth NFT on top.

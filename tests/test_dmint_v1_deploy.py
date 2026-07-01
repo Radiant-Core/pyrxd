@@ -935,7 +935,7 @@ class TestDeprecationAliases:
 
 class TestV1CborShape:
     """V1 dMint CBOR must satisfy the chain-truth shape from
-    ``docs/dmint-research-photonic-deploy.md`` §4: ``p:[1,4]``, no ``v``
+    ``docs/DMINT_RESEARCH.md`` §4: ``p:[1,4]``, no ``v``
     field, all dMint params live in contract scripts (not CBOR)."""
 
     def test_no_v_field_in_cbor(self):

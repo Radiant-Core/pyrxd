@@ -182,7 +182,7 @@ class TestCommitLockingScriptMainnetGolden:
 
     Pinning both shapes against the same on-chain tx closes the
     pattern-recognition audit's #R7 followup for commit scripts.
-    See ``docs/dmint-research-photonic-deploy.md`` for full context.
+    See ``docs/DMINT_RESEARCH.md`` for full context.
     """
 
     # Owner PKH appears in both vout 0 and vout 33 (same deployer).

@@ -1,6 +1,6 @@
 # Radiant Core wallet research — what does the node give us for free?
 
-**Date:** 2026-04-30. **Status:** read-only investigation. Informs the [wallet-cli plan](wallet-cli-plan.md) decision.
+**Date:** 2026-04-30. **Status:** read-only investigation. Informs the [wallet-cli plan](WALLET_CLI.md) decision.
 
 ## Question
 

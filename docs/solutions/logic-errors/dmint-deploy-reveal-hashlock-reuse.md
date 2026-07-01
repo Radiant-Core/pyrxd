@@ -107,6 +107,6 @@ for the regression-locking fixture.
   lesson that byte-substring scans of scripts misclassify; this M2 lesson
   is the same principle applied to *history* listings (coarse-grained
   scripthash queries collapse multiple unrelated spends).
-- `docs/dmint-research-photonic-deploy.md` §3.1 — the on-chain decode that
+- `docs/DMINT_RESEARCH.md` §3.1 — the on-chain decode that
   surfaced this issue (the GLYPH commit had 4 entries in its vout-0
   scripthash history, not 2).

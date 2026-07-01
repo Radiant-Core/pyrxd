@@ -16,8 +16,8 @@ Both ideas have appeal. Both would change what pyrxd *is*. This doc records why 
 ## Companion docs
 
 - [`radiant-core-wallet-research.md`](radiant-core-wallet-research.md) — what `radiant-cli` already does and doesn't.
-- [`wallet-cli-plan.md`](wallet-cli-plan.md) — the plan for the (now narrowed) pyrxd CLI.
-- [`wallet-cli-decisions.md`](wallet-cli-decisions.md) — six implementation choices for the CLI.
+- [`WALLET_CLI.md`](WALLET_CLI.md) — the plan for the (now narrowed) pyrxd CLI.
+- [`WALLET_CLI.md`](WALLET_CLI.md) — six implementation choices for the CLI.
 
 ## The "all-in-one package" option
 
@@ -72,7 +72,7 @@ A future `pyrxd setup` command that:
 
 - Detects whether a Radiant Core node is running locally; if not, prints the install steps for the user's platform.
 - Detects whether ElectrumX is configured; if not, lists known public servers.
-- Creates a wallet on first run (with the proper Enter-gate flow from [wallet-cli-decisions.md](wallet-cli-decisions.md) §6).
+- Creates a wallet on first run (with the proper Enter-gate flow from [WALLET_CLI.md](WALLET_CLI.md) §6).
 - Documents the three install paths: node-required, ElectrumX-only, library-only.
 
 Cost: a week. Benefit: 80% of the all-in-one UX win at 10% of the maintenance burden. We're not packaging Windows installers, we're not on the hook for Radiant Core 2.4 changing its config format. We're just helping users navigate the ecosystem they're already in.

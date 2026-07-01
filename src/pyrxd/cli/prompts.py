@@ -9,7 +9,7 @@ The mnemonic display follows the Cut 1 plan:
 
 The Enter gate slows the user down; it doesn't protect against
 scrollback / tmux / screen-share exposure. Documented as the user's
-responsibility. See ``docs/wallet-cli-decisions.md`` §6.
+responsibility. See ``docs/WALLET_CLI.md`` §6.
 
 Mnemonic and passphrase prompts go through ``click.prompt(hide_input=True)``
 rather than ``getpass.getpass`` so the test runner's ``input=`` parameter

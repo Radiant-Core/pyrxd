@@ -49,8 +49,8 @@ These ship in PR #65 and M2 reuses them unchanged:
      and `packages/lib/src/script.ts` end-to-end
    - Walk forward from RBG's deploy commit `a443d9df…878b` on mainnet
      to find the actual reveal tx; decode it byte-by-byte
-   - Document findings in a new `docs/dmint-research-photonic-deploy.md`
-     or extend `dmint-research-mainnet.md` §6
+   - Document findings in a new `docs/DMINT_RESEARCH.md`
+     or extend `DMINT_RESEARCH.md` §6
 
    **Exit criteria** (Phase 2a is done when):
    - Commit-tx output layout captured byte-for-byte (vout count, value,
@@ -73,7 +73,7 @@ These ship in PR #65 and M2 reuses them unchanged:
    returning all live contract UTXOs for a token. Uses the codescript-
    hash listunspent primitive against ElectrumX. ~30 lines.
 
-**Plus**: the `dmint-followup.md` stale banner rewrite that was
+**Plus**: the `DMINT_RESEARCH.md` stale banner rewrite that was
 deferred to M2 also lands here. (The V1-default flip is in Key
 Decisions.)
 
@@ -167,7 +167,7 @@ Concrete deliverable for the research phase, before Phase 2b code:
 - The contract-ref-derivation rule: how does each parallel contract's
   `contractRef` relate to the commit's ref-seed P2PKH outpoint?
 - One byte-decoded mainnet V1 deploy reveal (RBG or another live
-  token) saved as a fixture in `docs/dmint-research-photonic-deploy.md`
+  token) saved as a fixture in `docs/DMINT_RESEARCH.md`
   for byte-equal testing in Phase 2b
 
 ## Out of Scope
@@ -227,7 +227,7 @@ These survive Phase 2a and require a plan-author judgment call.
    — `token_ref` for the public API, internally compute the
    codescript-hash. Plan-author decision.
 
-4. **Stale-doc banner timing.** `dmint-followup.md` got a banner in
+4. **Stale-doc banner timing.** `DMINT_RESEARCH.md` got a banner in
    M1; the original brainstorm said full rewrite lands in M2. Confirm
    the rewrite is in scope here, or push to M2 closeout / a separate
    docs PR.
@@ -239,7 +239,7 @@ These survive Phase 2a and require a plan-author judgment call.
 - [`docs/plans/2026-05-07-feat-dmint-v1-mint-and-reference-miner-plan.md`](../plans/2026-05-07-feat-dmint-v1-mint-and-reference-miner-plan.md) — M1 plan
 - [`docs/solutions/logic-errors/dmint-v1-mint-shape-mismatch.md`](../solutions/logic-errors/dmint-v1-mint-shape-mismatch.md) — golden-vector lesson
 - [`docs/solutions/logic-errors/dmint-v1-classifier-gap.md`](../solutions/logic-errors/dmint-v1-classifier-gap.md) — same anti-pattern, parser side
-- [`docs/dmint-research-mainnet.md`](../dmint-research-mainnet.md) §2 (V1 layout), §4 (mint trace), §5 (deploy reveal not yet isolated)
+- [`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md) §2 (V1 layout), §4 (mint trace), §5 (deploy reveal not yet isolated)
 - `src/pyrxd/glyph/builder.py:291` — V2's `prepare_dmint_deploy`
 - `src/pyrxd/glyph/dmint.py:352-504` — M1 V1 builders (reused)
 - `src/pyrxd/glyph/dmint.py:2156` — `find_dmint_funding_utxo` (the pattern to mirror)

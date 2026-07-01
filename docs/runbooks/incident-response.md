@@ -27,7 +27,7 @@ Use this to set urgency and the disclosure clock. When in doubt, round up.
 | **Low / Info** | Hardening gaps, missing warnings, defense-in-depth | Backlog |
 
 The trust boundaries and current accepted residuals are in
-[`docs/threat-model.md`](../threat-model.md) — read the relevant scenario
+[`SECURITY.md`](../../SECURITY.md) Part II — read the relevant scenario
 (S1–S20) before assessing impact.
 
 ## The flow
@@ -81,7 +81,7 @@ issue, or PR.
 - Confirm to the reporter that it's out; thank them.
 - If a config/usage change is needed by users, note it in the advisory and
   the release notes.
-- Update [`docs/threat-model.md`](../threat-model.md): close the gap or add
+- Update [`SECURITY.md`](../../SECURITY.md) Part II: close the gap or add
   the new scenario, and record any newly-accepted residual.
 
 ## After-action

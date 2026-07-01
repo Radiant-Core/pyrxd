@@ -187,7 +187,7 @@ def _confirm_or_abort(ctx: CliContext, sections: list[_BroadcastSummary]) -> Non
 def _metadata_summary(metadata: GlyphMetadata) -> _BroadcastSummary:
     """Surface user-readable metadata fields in the broadcast summary.
 
-    Threat model finding S7 (docs/threat-model.md): users running
+    Threat model finding S7 (SECURITY.md Part II): users running
     `glyph mint-nft` from a metadata.json may not realize what
     they're actually committing. The funding key, owner_pkh, etc. all
     come from the wallet/CLI args (not the file), so theft via this

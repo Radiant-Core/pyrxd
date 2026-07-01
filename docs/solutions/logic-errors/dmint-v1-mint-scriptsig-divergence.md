@@ -14,7 +14,7 @@ tags: [dmint, v1, mint, scriptsig, covenant, mainnet, recurring-pattern, silent-
 related_files:
   - src/pyrxd/glyph/dmint.py
   - tests/test_dmint_v1_mint.py
-  - docs/dmint-research-mainnet.md
+  - docs/DMINT_RESEARCH.md
 related_solutions:
   - docs/solutions/logic-errors/dmint-v1-mint-shape-mismatch.md
   - docs/solutions/logic-errors/dmint-v1-classifier-gap.md
@@ -40,7 +40,7 @@ script-verify failure**, not network loss.
 ## Root Cause
 
 The V1 covenant's PoW preimage (epilogue offsets 99–115, decoded in
-`docs/dmint-research-mainnet.md` §3.5) is built from values pushed onto
+`docs/DMINT_RESEARCH.md` §3.5) is built from values pushed onto
 the scriptSig:
 
 ```
@@ -219,5 +219,5 @@ convention: 32-byte `SHA256d(funding_input_script)` and 32-byte
 
 - Prior incident: [`dmint-v1-mint-shape-mismatch.md`](dmint-v1-mint-shape-mismatch.md)
 - Classifier-gap predecessor: [`dmint-v1-classifier-gap.md`](dmint-v1-classifier-gap.md)
-- Mainnet trace: [`docs/dmint-research-mainnet.md`](../../dmint-research-mainnet.md) §3.5
+- Mainnet trace: [`docs/DMINT_RESEARCH.md`](../../DMINT_RESEARCH.md) §3.5
 - Validation txid: `c9fdcd3488f3e396bec3ce0b766bb8070963e7e75bb513b8820b6663e469e530`

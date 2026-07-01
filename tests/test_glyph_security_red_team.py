@@ -58,7 +58,7 @@ class TestRT01CborSizeBomb:
         The cap is sourced from ``_MAX_CBOR_PAYLOAD_BYTES`` so it tracks
         any future tuning. Previously hardcoded 64 KB — bumped to 256 KB
         in M2 to accommodate V1 dMint deploys that embed media (see
-        docs/dmint-research-photonic-deploy.md §4)."""
+        docs/DMINT_RESEARCH.md §4)."""
         # Pad to near limit with an unknown key that decode_payload ignores.
         big_cbor = cbor2.dumps(
             {

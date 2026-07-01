@@ -2,7 +2,7 @@
 
 The CLI is intentionally narrow — focused on operations that don't have
 a clean equivalent in ``radiant-cli`` (the node wallet). See
-``docs/wallet-cli-plan.md`` and ``docs/scope-decision-2026-04-30.md``
+``docs/WALLET_CLI.md`` and ``docs/scope-decision-2026-04-30.md``
 for the full scope rationale.
 """
 

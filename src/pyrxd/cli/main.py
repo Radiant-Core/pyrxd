@@ -1,6 +1,6 @@
 """pyrxd CLI entry point.
 
-Command shape (Cut 1 — see docs/wallet-cli-plan.md):
+Command shape (Cut 1 — see docs/WALLET_CLI.md):
 
     pyrxd [GLOBAL OPTS] <command> [ARGS]
 

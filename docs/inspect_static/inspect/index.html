@@ -11,7 +11,7 @@
                                 — Pyodide loads from jsdelivr CDN with SRI; runs WASM.
                                   'unsafe-eval' is required by Pyodide internals (it
                                   uses eval() in the Python-to-JS bridge); cost is
-                                  documented in docs/threat-model.md.
+                                  documented in SECURITY.md.
        style-src 'self'          — only our own CSS
        connect-src 'self' https://cdn.jsdelivr.net wss://electrumx.radiant4people.com:50022
                                 — page-relative (for vendored wheels in

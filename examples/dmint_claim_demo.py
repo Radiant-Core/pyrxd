@@ -268,7 +268,7 @@ async def main() -> None:
     miner_pkh = bytes(Hex20(miner_key.public_key().hash160()))
     contract_vout = int(CONTRACT_VOUT)
     # Default to an OP_RETURN msg matching observed mainnet behavior.
-    # Every mint tx traced in docs/dmint-research-mainnet.md §4 includes a
+    # Every mint tx traced in docs/DMINT_RESEARCH.md §4 includes a
     # `msg`-marker OP_RETURN at vout[2]; the V1 covenant binds outputHash
     # to that script, so omitting it would change the preimage shape
     # (and likely cause a covenant rejection, though this is unverified).

@@ -3,7 +3,7 @@
 These are intentionally minimal — they cover the no-node onboarding
 case ("I just installed pyrxd, what's my address and balance?")
 without trying to compete with ``radiant-cli`` for general wallet ops.
-See docs/wallet-cli-plan.md "Address & balance" for the rationale.
+See docs/WALLET_CLI.md "Address & balance" for the rationale.
 """
 
 from __future__ import annotations

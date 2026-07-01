@@ -52,7 +52,7 @@ The byte-by-byte chain truth this page is anchored to:
 | Total supply         | 32 × 625,000 × 50,000 = 10⁹ photons (10,000 GLYPH @ 8 decimals)    |
 
 Full byte-by-byte decode lives at
-[`docs/dmint-research-photonic-deploy.md`](../dmint-research-photonic-deploy.md).
+[`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md).
 pyrxd's M2 test suite includes a byte-equal golden vector pinned
 against vout 0 of the reveal: feed identical params to
 `prepare_dmint_deploy` → `build_reveal_outputs(commit_txid)` and the
@@ -233,7 +233,7 @@ shape wherever sensible. There are five places M2 deviates intentionally:
    key, so emitting the wrong one produces a token no indexer recognises.
 
 These are all documented in
-[`docs/dmint-research-photonic-deploy.md`](../dmint-research-photonic-deploy.md) §7.
+[`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md) §7.
 
 ---
 

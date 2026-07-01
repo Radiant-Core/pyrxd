@@ -135,8 +135,8 @@ This pattern was applied to a real decision. The shape of the actual case, as ev
 
 **Adjacent process docs in this repo:**
 - [docs/scope-decision-2026-04-30.md](../../scope-decision-2026-04-30.md) — Earlier scope decision (pyrxd stays narrow). Demonstrates the repo's pattern for scope questions.
-- [docs/threat-model.md](../../threat-model.md) — Security review and threat modeling; complements the adversarial review discipline this pattern formalizes.
-- [docs/red-team-checklist.md](../../red-team-checklist.md) — Red team review checklist; the adversarial review discipline this pattern relies on.
+- [SECURITY.md](../../SECURITY.md) Part II — Security review and threat modeling; complements the adversarial review discipline this pattern formalizes.
+- [SECURITY.md](../../SECURITY.md) Part V — Red team review checklist; the adversarial review discipline this pattern relies on.
 
 **Solution docs in this category:**
 - (none other yet) — this is the first entry in `docs/solutions/design-decisions/`.

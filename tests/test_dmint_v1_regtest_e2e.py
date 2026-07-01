@@ -5,7 +5,7 @@ This closes the last real dMint gap. The builders (``build_dmint_v1_contract_scr
 ``build_dmint_v1_mint_preimage``, ``build_mint_scriptsig``, ``build_dmint_mint_tx``)
 have all shipped and are covered by byte-equal / mainnet-byte-equality golden
 vectors — but NOTHING had ever been validated against a real Radiant node's
-script interpreter. ``docs/threat-model.md`` item 12 ("dMint PoW path not
+script interpreter. ``SECURITY.md`` Part II gap #13 ("dMint PoW path not
 implemented") is stale in wording; the true gap was "never node-validated".
 
 This test proves, on an isolated ``radiant-core`` regtest node via

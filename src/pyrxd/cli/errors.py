@@ -5,7 +5,7 @@ Library code raises typed exceptions (``ValidationError``, ``NetworkError``,
 of :class:`click.ClickException` so click handles formatting and exit
 codes uniformly across direct ``cli()`` invocations and the test runner.
 
-Exit codes (per docs/wallet-cli-plan.md §"Exit codes"):
+Exit codes (per docs/WALLET_CLI.md §"Exit codes"):
   0   success
   1   user-error
   2   network error

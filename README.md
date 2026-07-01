@@ -302,8 +302,8 @@ reference + tutorials + how-to guides + concepts).
 Other resources in this repo:
 
 - [`examples/`](examples/) — runnable end-to-end demos
-- [`docs/dmint-research-photonic.md`](docs/dmint-research-photonic.md) — Photonic Wallet TS reference
-- [`docs/dmint-research-mainnet.md`](docs/dmint-research-mainnet.md) — decoded live dMint contracts
+- [`docs/DMINT_RESEARCH.md`](docs/DMINT_RESEARCH.md) — Photonic Wallet TS reference
+- [`docs/DMINT_RESEARCH.md`](docs/DMINT_RESEARCH.md) — decoded live dMint contracts
 - [`SECURITY.md`](SECURITY.md) — security policy and disclosure
 
 ## Contributing

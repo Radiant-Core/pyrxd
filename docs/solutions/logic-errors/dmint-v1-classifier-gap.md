@@ -36,7 +36,7 @@ The 10 dmint contract UTXOs at vouts 0-9 — the entire mining pool — were sil
 1. Pulled the reveal tx via the live mainnet client and dumped the raw output scripts for vouts 0-9.
 2. Hand-decoded one script byte-by-byte against the V2 layout that `DmintState._from_v2_script` expected. Found only **6** state pushes before an `OP_STATESEPARATOR` (0xbd), not the 10 V2 pushes the parser was walking.
 3. Counted the post-separator code section: **145 bytes**, byte-identical across all 10 outputs except a single byte at offset 19 inside the epilogue (`0xaa` = `OP_HASH256` = SHA256D).
-4. Cross-referenced with `docs/dmint-research-mainnet.md` §2.2/§3, which already documents the V1 format (6 state items + fixed code template). The shipped parser was written against V2 only.
+4. Cross-referenced with `docs/DMINT_RESEARCH.md` §2.2/§3, which already documents the V1 format (6 state items + fixed code template). The shipped parser was written against V2 only.
 5. Audited `tests/test_glyph_dmint.py` — every fixture was a synthetic script generated from `build_dmint_state_script` (which is V2). No real-mainnet bytes were ever exercised against `from_script`, so the V1/V2 mismatch could not surface.
 
 ## Root Cause
@@ -102,16 +102,16 @@ All 10 contract UTXOs returned identical state (modulo `height`), confirming the
 
 **Spec docs that informed the fix**
 
-- [`docs/dmint-research-mainnet.md`](../../dmint-research-mainnet.md) — V1 byte layout
+- [`docs/DMINT_RESEARCH.md`](../../DMINT_RESEARCH.md) — V1 byte layout
   - §1 Discovery method (line 15) — node access, epilogue fingerprint `dec0e9aa76e378e4` (line 28)
   - §2.2 Byte-by-byte decode of UTXO #1 (line 94) — full V1 opcode walk
   - §3 Cross-comparison (line 155) — table noting "V2 state items: 3 … matches V1 preimage layout, not V2" (line 145)
   - §5 Open questions (line 259) — explicit "Cannot distinguish V1 vs V2 from the guide alone" (line 268), "Python builder needs both code paths and a switch" (lines 272-273)
-- [`docs/dmint-research-photonic.md`](../../dmint-research-photonic.md) — V2 reference and V1/V2 classification
+- [`docs/DMINT_RESEARCH.md`](../../DMINT_RESEARCH.md) — V2 reference and V1/V2 classification
   - §2.1 State script V2, 10 items (line 48)
   - §10 Follow-up: V1 vs V2 classification + ship-which decision (line 584)
   - §10.2 V1 bytecode location and `V1_BYTECODE_PART_B` literal (lines 608-622)
-- [`docs/dmint-followup.md`](../../dmint-followup.md) — PoW dMint future-work scope context
+- [`docs/DMINT_RESEARCH.md`](../../DMINT_RESEARCH.md) — PoW dMint future-work scope context
 
 **PR chain (relevant context)**
 
@@ -163,6 +163,6 @@ A small helper that takes a list of `(txid, vout | "all")` pairs, fetches the ra
 
 ### What this teaches about reading specs
 
-`docs/dmint-research-mainnet.md` documented the V1 layout. `docs/dmint-research-photonic.md` documented V2. The parser was written from the photonic doc; mainnet runs V1. The lesson is not "read more docs" — both docs were read. The lesson is **pick the spec that matches deployed reality, not intended reality**.
+`docs/DMINT_RESEARCH.md` documented the V1 layout. `docs/DMINT_RESEARCH.md` documented V2. The parser was written from the photonic doc; mainnet runs V1. The lesson is not "read more docs" — both docs were read. The lesson is **pick the spec that matches deployed reality, not intended reality**.
 
 Practical heuristic for pyrxd: before implementing a parser from a spec document, confirm with a block explorer or RPC query that at least one real transaction matches that spec's shape. If you can't find one, you are either parsing a future format (fine, but mark it experimental) or parsing a format that was never actually deployed (a trap). The captured-fixture rule enforces this automatically: you cannot complete the checklist for a format that has no on-chain instances.

@@ -154,7 +154,7 @@ def build_mint_scriptsig(
         V2 (nonce_width=8): ``<0x08> <nonce:8B> <0x20> <inputHash:32B> <0x20> <outputHash:32B> <0x00>`` → 76 bytes
         V1 (nonce_width=4): ``<0x04> <nonce:4B> <0x20> <inputHash:32B> <0x20> <outputHash:32B> <0x00>`` → 72 bytes
 
-    The V1 layout is documented in docs/dmint-research-mainnet.md §4 (vin[0]
+    The V1 layout is documented in docs/DMINT_RESEARCH.md §4 (vin[0]
     of the mainnet mint trace at ``146a4d68…f3c``). Same shape as V2,
     differing only in nonce width and corresponding push opcode.
 
@@ -1335,7 +1335,7 @@ def _build_dmint_v1_mint_tx(
     """Build a V1 dMint mint tx. Internal — dispatched from build_dmint_mint_tx
     when state.is_v1.
 
-    Mainnet V1 mint transaction shape (docs/dmint-research-mainnet.md §4)::
+    Mainnet V1 mint transaction shape (docs/DMINT_RESEARCH.md §4)::
 
         vin[0]  contract UTXO          unlocked by build_mint_scriptsig(nonce_4b, input_hash, output_hash)
         vin[1]  funding UTXO           plain-RXD P2PKH paying reward + fee + change
@@ -1435,7 +1435,7 @@ def _build_dmint_v1_mint_tx(
     change_script = b"\x76\xa9\x14" + miner_pkh + b"\x88\xac"
     op_return_script: bytes | None = None
     if op_return_msg is not None:
-        # Photonic-Wallet convention (docs/dmint-research-mainnet.md §4 vout[2]):
+        # Photonic-Wallet convention (docs/DMINT_RESEARCH.md §4 vout[2]):
         # OP_RETURN PUSH3 "msg" <push-len> <message>
         # The "msg" marker push is what wallet/explorer parsers key on to
         # surface the message; without it, the OP_RETURN is just opaque

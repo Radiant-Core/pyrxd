@@ -150,7 +150,7 @@ Three concrete gaps block deploying a usable dMint token via pyrxd:
    primitive.
 
 3. **The Photonic Wallet V1 deploy bytes are not yet captured locally.**
-   Per [`docs/dmint-research-mainnet.md`](../dmint-research-mainnet.md) §5:
+   Per [`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md) §5:
    "Deploy reveal TX not yet isolated." pyrxd cannot byte-compare its
    output against on-chain truth; this is the same anti-pattern that
    produced four rounds of M1 review findings (see
@@ -299,7 +299,7 @@ its raw bytes. Decode byte-by-byte:
 - Reveal scriptSigs (especially vout[0] of commit which carries the CBOR payload push)
 - Decode the CBOR payload — record the exact field set Photonic emits
 
-  Save findings in `docs/dmint-research-photonic-deploy.md` (new file)
+  Save findings in `docs/DMINT_RESEARCH.md` (new file)
   with hex fixtures suitable for byte-equal assertions.
 
 **Phase 2a.2 — Confirm Photonic source where source is canonical.**
@@ -324,7 +324,7 @@ isn't available; specifically read:
 
 **Phase 2a exit criteria** (Phase 2a is done when ALL are met):
 - [x] "snk" 35-output discrepancy reconciled with documented explanation
-  (see `docs/dmint-research-photonic-deploy.md` §2: 1 FT-commit + 32 ref-seeds + 1 NFT-commit + 1 change)
+  (see `docs/DMINT_RESEARCH.md` §2: 1 FT-commit + 32 ref-seeds + 1 NFT-commit + 1 change)
 - [x] At least one **mainnet** V1 deploy reveal saved as a hex fixture
   (`b965b32d…9dd6` reveal raw + `a443d9df…878b` commit raw — saved at
   `/tmp/dmint-m2-research/{commit,reveal}_raw.hex`; will be moved into
@@ -574,14 +574,14 @@ failure (key access failure, OOM, etc.); atomic three-pass avoids it.
 
 **Phase 2b.6 — Documentation (minimal in this PR)**
 
-The full rewrite of `docs/dmint-followup.md` ships as a **separate
+The full rewrite of `docs/DMINT_RESEARCH.md` ships as a **separate
 sibling PR** after M2 lands. M2's code PR includes only:
 
 | File | Change |
 |---|---|
 | `docs/plans/2026-05-07-feat-dmint-v1-mint-and-reference-miner-plan.md` | Add a brief "M2 closeout" section noting which deferred items got pulled forward. |
 | `prepare_dmint_deploy` docstring | Updated for the new dispatch + sibling params behavior. |
-| `docs/dmint-followup.md` | Banner line update (still stale; full rewrite in sibling PR). |
+| `docs/DMINT_RESEARCH.md` | Banner line update (still stale; full rewrite in sibling PR). |
 
 (The sibling-PR pattern keeps the M2 code review surface focused on
 code, not 100+ lines of doc rewriting.)
@@ -644,7 +644,7 @@ Punting again would repeat the anti-pattern.
 
 #### Phase 2a (must complete before any code in Phase 2b)
 
-- [x] `docs/dmint-research-photonic-deploy.md` exists and explains the
+- [x] `docs/DMINT_RESEARCH.md` exists and explains the
   35-output GLYPH deploy commit shape: 1 FT-commit + 32 ref-seeds + 1
   NFT-commit + 1 change (joint NFT+FT-style deploy with mint-fresh auth
   NFT chosen for pyrxd; forward-prior auth NFT documented as deferred)
@@ -907,8 +907,8 @@ bugs found here are fixed in M2.1.
 
 ## Documentation Plan
 
-- [ ] `docs/dmint-research-photonic-deploy.md` (new, Phase 2a output)
-- [ ] `docs/dmint-followup.md` (full rewrite, Phase 2b.6)
+- [ ] `docs/DMINT_RESEARCH.md` (new, Phase 2a output)
+- [ ] `docs/DMINT_RESEARCH.md` (full rewrite, Phase 2b.6)
 - [ ] `examples/dmint_deploy_demo.py` (new, modeled on
   `dmint_claim_demo.py`)
 - [ ] `prepare_dmint_deploy` docstring rewrite to document the V1
@@ -943,7 +943,7 @@ Every critical gap from the SpecFlow analysis is addressed:
 - **I4 (Plan-stage decision: `find_dmint_contract_utxos` input)**:
   takes `token_ref`, derives codescript-hash internally
 - **Brainstorm Open Q #4 (banner timing)**: full rewrite of
-  `dmint-followup.md` ships as a sibling PR after M2; M2's code PR
+  `DMINT_RESEARCH.md` ships as a sibling PR after M2; M2's code PR
   includes only the banner update
 - **N4 (`prepare_dmint_deploy` post-flip semantics)**: auto-dispatch
   on params type (`DmintV1DeployParams` vs `DmintV2DeployParams`),
@@ -956,8 +956,8 @@ Every critical gap from the SpecFlow analysis is addressed:
 
 - [`docs/brainstorms/2026-05-08-dmint-v1-deploy-m2-brainstorm.md`](../brainstorms/2026-05-08-dmint-v1-deploy-m2-brainstorm.md)
 - [`docs/plans/2026-05-07-feat-dmint-v1-mint-and-reference-miner-plan.md`](2026-05-07-feat-dmint-v1-mint-and-reference-miner-plan.md) — M1 plan
-- [`docs/dmint-research-mainnet.md`](../dmint-research-mainnet.md) §1-§5 (V1 layout, mint trace, deploy gap)
-- [`docs/dmint-research-photonic.md`](../dmint-research-photonic.md) — Photonic source citations from M1 research
+- [`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md) §1-§5 (V1 layout, mint trace, deploy gap)
+- [`docs/DMINT_RESEARCH.md`](../DMINT_RESEARCH.md) — Photonic source citations from M1 research
 - [`docs/solutions/logic-errors/dmint-v1-mint-shape-mismatch.md`](../solutions/logic-errors/dmint-v1-mint-shape-mismatch.md) — golden-vector lesson
 - [`docs/solutions/logic-errors/funding-utxo-byte-scan-dos.md`](../solutions/logic-errors/funding-utxo-byte-scan-dos.md) — opcode-aware classification lesson
 - [`src/pyrxd/glyph/builder.py:291`](../../src/pyrxd/glyph/builder.py#L291) — V2 `prepare_dmint_deploy`
@@ -991,7 +991,7 @@ Every critical gap from the SpecFlow analysis is addressed:
 
 ### Files to be created
 
-- `docs/dmint-research-photonic-deploy.md` (Phase 2a output)
+- `docs/DMINT_RESEARCH.md` (Phase 2a output)
 - `examples/dmint_deploy_demo.py` (Phase 2b.5)
 - `tests/test_dmint_v1_deploy.py` (Phase 2b.5)
 
@@ -1009,6 +1009,6 @@ Every critical gap from the SpecFlow analysis is addressed:
   codescript-hash is computed inline; no separate helper)
 - `tests/test_dmint_deploy_integration.py` — add V1 commit + reveal
   testmempoolaccept cases
-- `docs/dmint-followup.md` — banner update only (full rewrite is a
+- `docs/DMINT_RESEARCH.md` — banner update only (full rewrite is a
   sibling PR)
 - `docs/plans/2026-05-07-feat-dmint-v1-mint-and-reference-miner-plan.md` — M2 closeout note
